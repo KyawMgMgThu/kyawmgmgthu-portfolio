@@ -3,11 +3,11 @@ import { motion, useInView } from "framer-motion";
 
 const App = () => {
   // Section refs
-  const homeRef = useRef(null);
-  const aboutRef = useRef(null);
-  const projectsRef = useRef(null);
-  const blogRef = useRef(null);
-  const contactRef = useRef(null);
+  const homeRef = useRef<any>(null);
+  const aboutRef = useRef<any>(null);
+  const projectsRef = useRef<any>(null);
+  const blogRef = useRef<any>(null);
+  const contactRef = useRef<any>(null);
 
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,7 +29,7 @@ const App = () => {
   }, [isAboutInView, isProjectsInView, isBlogInView, isContactInView]);
 
   // Smooth scroll function
-  const scrollToSection = (sectionRef) => {
+  const scrollToSection = (sectionRef: React.RefObject<HTMLElement>) => {
     setMobileMenuOpen(false);
     window.scrollTo({
       top: sectionRef.current.offsetTop - 80,
