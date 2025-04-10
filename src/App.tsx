@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { FaCode, FaBolt, FaUsersCog, FaHeart, FaLightbulb, FaMobileAlt, FaGithub, FaFacebook, FaPhone } from "react-icons/fa";
+import ChatBot from "./components/chatbot";
 
 const App = () => {
   // Section refs
@@ -83,7 +84,7 @@ const App = () => {
     <>
       <div className="w-full max-w-full overflow-x-hidden font-woff bg-light-bg">
         {/* Navbar */}
-        <nav className="flex justify-between items-center bg-light-bg py-6 px-6 md:px-12 lg:px-24 border-b-2 sticky top-0 z-50">
+        <nav className="flex justify-between items-center bg-light-bg py-6 px-6 md:px-12 lg:px-24 border-b-2 w-[100%]  fixed top-0 z-50">
           <div className="text-2xl italic font-medium cursor-pointer">
             <span className="text-light-font">KyawMgMgThu</span>
             <span className="text-light-teal">.dev</span>
@@ -672,6 +673,8 @@ const App = () => {
 
           </footer>
         </div>
+
+        <ChatBot />
       </div>
     </>
   );
