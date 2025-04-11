@@ -155,7 +155,6 @@ const App = () => {
         >
           <div className="text-4xl italic font-medium mb-4">
             <span className="text-light-font">KyawMgMgThu</span>
-            <span className="text-light-teal">.dev</span>
           </div>
 
           <motion.div
@@ -185,7 +184,6 @@ const App = () => {
         <nav className="flex justify-between items-center bg-light-bg py-6 px-6 md:px-12 lg:px-24 border-b-2 w-[100%]  fixed top-0 z-50">
           <div className="text-2xl italic font-medium cursor-pointer">
             <span className="text-light-font">KyawMgMgThu</span>
-            <span className="text-light-teal">.dev</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -985,9 +983,10 @@ const App = () => {
         </motion.p>
 
         <motion.a
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        viewport={{ once: true }}
           href="mailto:mthu35997@gmail.com"
           className="inline-block bg-light-teal text-white px-6 py-2 rounded-md hover:bg-light-teal-light transition"
         >
