@@ -2,25 +2,58 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { FaRobot, FaTimes, FaPaperPlane, FaCode, FaLaravel, FaDatabase } from "react-icons/fa";
 
-// Card data must be declared before knowledgeBase
 const projectCards = [
   {
-    title: "Digital Menu - Restaurant",
-    description: "Full-featured online learning platform with Laravel Livewire frontend and Laravel failment backend",
-    tech: ["Laravel ", "Laravel", "MySQL"],
-    link: "#"
+    title: "QR Code Digital Menu System",
+    description:
+      "A contactless restaurant menu solution allowing customers to view menus, ingredients, and promotions by scanning QR codes. Features real-time updates and analytics.",
+    tech: ["Laravel 10", "Filament", "Livewire", "MySQL", "AWS", "EC2"],
+    link: "https://github.com/KyawMgMgThu/DIgital_menu"
   },
   {
-    title: "RecyLink - Waste Management",
-    description: "Sustainability dashboard with Next.js and Firebase integration",
-    tech: ["Next.js", "Firebase", "Node.js"],
-    link: "#"
+    title: "Personal Portfolio",
+    description:
+      "A sleek and modern portfolio built to showcase my work, skills, and projects. Designed with performance and aesthetics in mind using animations and responsive layouts.",
+    tech: [
+      "React 19",
+      "TypeScript",
+      "Vite",
+      "Tailwind CSS 4",
+      "Framer Motion",
+      "FontAwesome",
+      "React Icons"
+    ],
+    link: "https://github.com/KyawMgMgThu/kyawmgmgthu-portfolio"
   },
   {
-    title: "RealTimeChat App",
-    description: "WebSocket-based messaging application with React and Node.js",
-    tech: ["React", "Socket.IO", "MongoDB"],
-    link: "#"
+    title: "Kid's Learning Website",
+    description:
+      "An interactive educational platform for kids featuring games, drawing, speech tools, and animations. Helps children learn numbers, alphabets, colors, and more.",
+    tech: [
+      "React",
+      "Bootstrap",
+      "React-Speech",
+      "MUI",
+      "Canvas",
+      "FontAwesome",
+      "React-Router-DOM"
+    ],
+    link: "https://github.com/KyawMgMgThu/KG_Learning_website"
+  },
+  {
+    title: "Kyaw Gyi POS System",
+    description:
+      "A modern POS system for small businesses featuring inventory management, receipt printing, sales reports, and PDF export. Built for performance and scalability.",
+    tech: [
+      "Laravel 10",
+      "React",
+      "Vite",
+      "Bootstrap 5",
+      "SweetAlert2",
+      "jsPDF",
+      "Axios"
+    ],
+    link: "https://github.com/KyawMgMgThu/pos_system"
   }
 ];
 
@@ -163,6 +196,7 @@ const SmartChatBot = () => {
           animate={{ scale: 1, opacity: 1 }}
           className="bg-white shadow-xl rounded-t-lg rounded-bl-lg w-80 h-96 flex flex-col border border-gray-200"
         >
+          
           {/* Header */}
           <div className="bg-gradient-to-r bg-light-teal text-white p-3 rounded-t-lg flex justify-between items-center">
             <div className="flex items-center">
