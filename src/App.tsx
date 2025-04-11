@@ -944,7 +944,7 @@ const App = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="relative mb-10"
+          className="relative mb-20"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Contact Me</h2>
 
@@ -972,24 +972,16 @@ const App = () => {
         </motion.div>
 
         {/* Main Message */}
-        <motion.h3
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-2xl font-semibold text-gray-900 mb-4"
-        >
-          Let’s be awesome together!
-        </motion.h3>
+
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
-          className="text-gray-700 mb-6"
+          className="text-gray-700 my-4"
         >
-          As a dev, I am driven by my love for coding and my desire for new challenges. If you have opportunities for collaboration or want to build something amazing, don’t hesitate to contact me!
+          Driven by creativity and a deep love for coding, I’m always on the lookout for innovative projects and inspiring collaborations. Got something in mind? Let’s build it together!
         </motion.p>
 
         <motion.a
