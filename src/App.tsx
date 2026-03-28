@@ -370,7 +370,7 @@ const App = () => {
                 Available for freelance projects
               </span>
               <h5 className="text-xl text-light-teal mt-1">Hello, I'm</h5>
-              <h1 className="text-3xl md:text-5xl font-extrabold font-display">Kyaw Mg Mg Thu</h1>
+              <h1 className="text-3xl md:text-5xl font-extrabold font-display text-light-font">Kyaw Mg Mg Thu</h1>
               <h2 className="text-2xl md:text-4xl gradient-text">
                 Freelancer | Full-stack Developer
               </h2>
