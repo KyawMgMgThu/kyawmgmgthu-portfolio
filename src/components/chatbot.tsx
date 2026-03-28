@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FaRobot, FaTimes, FaPaperPlane, FaCode, FaLaravel, FaDatabase } from "react-icons/fa";
 
 const projectCards = [
@@ -78,10 +78,10 @@ const experienceCards = [
 // Now the knowledgeBase can use those variables
 const knowledgeBase: Record<string, { response: string | string[], isCard?: boolean, cardData?: typeof projectCards | typeof experienceCards }> = {
   "hello": {
-    response: "Hello! I'm here to help you learn about Kyaw Mg Mg Thu's portfolio. Ask me about his skills, projects, education, or how to contact him!"
+    response: "Hello! I'm Kyaw's portfolio assistant. I can quickly show his skills, featured projects, education, and contact details."
   },
   "hi": {
-    response: "Hi there! I can tell you about Kyaw's full-stack development skills, recent projects, or background. What would you like to know?"
+    response: "Hi there! Ask me about Kyaw's full-stack stack, real-world projects, or how to work with him."
   },
   "skill": {
     response: [
@@ -127,10 +127,15 @@ const knowledgeBase: Record<string, { response: string | string[], isCard?: bool
   }
 };
 
-const SmartChatBot = () => {
+type SmartChatBotProps = {
+  isDark?: boolean;
+};
+
+const SmartChatBot = ({ isDark = false }: SmartChatBotProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ text: string; sender: "user" | "bot"; isCard?: boolean; cardData?: typeof projectCards | typeof experienceCards }>>([]);
   const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const getBotResponse = (userInput: string) => {
@@ -151,6 +156,7 @@ const SmartChatBot = () => {
     setMessages(prev => [...prev, userMessage]);
     const currentInput = inputValue;
     setInputValue('');
+    setIsTyping(true);
 
     setTimeout(() => {
       const botResponse = getBotResponse(currentInput);
@@ -177,6 +183,7 @@ const SmartChatBot = () => {
           setMessages(prev => [...prev, { text: botResponse.response as string, sender: 'bot' }]);
         }
       }
+      setIsTyping(false);
     }, 800);
   };
 
@@ -190,15 +197,20 @@ const SmartChatBot = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {isOpen ? (
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-white shadow-xl rounded-t-lg rounded-bl-lg w-80 h-96 flex flex-col border border-gray-200"
-        >
+      <AnimatePresence mode="wait">
+        {isOpen ? (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ duration: 0.2 }}
+            className={`shadow-xl rounded-t-lg rounded-bl-lg w-80 h-96 flex flex-col border ${
+              isDark ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"
+            }`}
+          >
           
           {/* Header */}
-          <div className="bg-gradient-to-r bg-light-teal text-white p-3 rounded-t-lg flex justify-between items-center">
+          <div className="animated-gradient-bg text-white p-3 rounded-t-lg flex justify-between items-center">
             <div className="flex items-center">
               <FaRobot className="mr-2" />
               <h3 className="font-semibold">Portfolio Assistant</h3>
@@ -209,29 +221,29 @@ const SmartChatBot = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+          <div className={`flex-1 p-4 overflow-y-auto ${isDark ? "bg-slate-950/70" : "bg-gray-50"}`}>
             {messages.length === 0 ? (
-              <div className="text-center text-gray-500 h-full flex flex-col justify-center">
-                <p className="font-medium mb-2">Ask me about:</p>
-                <p className="text-sm">• Kyaw's skills</p>
-                <p className="text-sm">• Recent projects</p>
-                <p className="text-sm">• Education background</p>
-                <p className="text-sm">• How to contact</p>
+              <div className={`text-center h-full flex flex-col justify-center ${isDark ? "text-slate-300" : "text-gray-500"}`}>
+                <p className="font-medium mb-2">Try asking:</p>
+                <p className="text-sm">• What services do you offer?</p>
+                <p className="text-sm">• Show me your best projects</p>
+                <p className="text-sm">• What is your tech stack?</p>
+                <p className="text-sm">• How can I contact you?</p>
               </div>
             ) : (
               messages.map((message, index) => (
-                <div key={index}>
+                <motion.div key={index} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
                   {message.isCard ? (
                     <div className="mb-3">
                       {message.cardData === projectCards ? (
                         <div className="space-y-3">
                           {projectCards.map((project, i) => (
-                            <div key={i} className="border rounded-lg p-3 bg-white shadow-sm">
-                              <h4 className="font-semibold text-teal-600">{project.title}</h4>
-                              <p className="text-sm text-gray-600 mt-1">{project.description}</p>
+                            <div key={i} className={`border rounded-lg p-3 shadow-sm ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
+                              <h4 className="font-semibold text-light-teal">{project.title}</h4>
+                              <p className={`text-sm mt-1 ${isDark ? "text-slate-300" : "text-gray-600"}`}>{project.description}</p>
                               <div className="mt-2 flex flex-wrap gap-1">
                                 {project.tech.map((t, j) => (
-                                  <span key={j} className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                  <span key={j} className={`text-xs px-2 py-1 rounded ${isDark ? "bg-slate-800 text-slate-200" : "bg-gray-100 text-gray-700"}`}>
                                     {t}
                                   </span>
                                 ))}
@@ -242,12 +254,12 @@ const SmartChatBot = () => {
                       ) : (
                         <div className="grid grid-cols-1 gap-3">
                           {experienceCards.map((exp, i) => (
-                            <div key={i} className="border rounded-lg p-3 bg-white shadow-sm">
+                            <div key={i} className={`border rounded-lg p-3 shadow-sm ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
                               <div className="flex items-center gap-3">
                                 <div className="text-teal-500">{exp.icon}</div>
                                 <div>
-                                  <h4 className="font-semibold">{exp.title}</h4>
-                                  <p className="text-sm text-gray-600">{exp.description}</p>
+                                  <h4 className={`font-semibold ${isDark ? "text-slate-100" : "text-gray-900"}`}>{exp.title}</h4>
+                                  <p className={`text-sm ${isDark ? "text-slate-300" : "text-gray-600"}`}>{exp.description}</p>
                                 </div>
                               </div>
                             </div>
@@ -259,21 +271,37 @@ const SmartChatBot = () => {
                     <div className={`mb-3 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div
                         className={`max-w-xs p-3 rounded-lg ${message.sender === 'user'
-                          ? 'bg-gradient-to-r bg-light-teal text-white rounded-br-none'
-                          : 'bg-gray-200 text-gray-800 rounded-bl-none'}`}
+                          ? 'animated-gradient-bg text-white rounded-br-none'
+                          : `${isDark ? "bg-slate-800 text-slate-100" : "bg-gray-200 text-gray-800"} rounded-bl-none`}`}
                       >
                         {message.text}
                       </div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               ))
+            )}
+            {isTyping && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mb-3 flex justify-start"
+              >
+                <div className={`${isDark ? "bg-slate-800 text-slate-200" : "bg-gray-200 text-gray-700"} rounded-lg rounded-bl-none px-3 py-2 text-sm`}>
+                  <motion.span
+                    animate={{ opacity: [0.2, 1, 0.2] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    Typing...
+                  </motion.span>
+                </div>
+              </motion.div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
-          <div className="p-3 border-t border-gray-200 bg-white">
+          <div className={`p-3 border-t ${isDark ? "border-slate-700 bg-slate-900" : "border-gray-200 bg-white"}`}>
             <div className="flex">
               <input
                 type="text"
@@ -281,28 +309,37 @@ const SmartChatBot = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask about the portfolio..."
-                className="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-teal-500 text-sm"
+                className={`flex-1 border rounded-l-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-teal-500 text-sm ${
+                  isDark
+                    ? "bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-400"
+                    : "border-gray-300 text-gray-900"
+                }`}
               />
               <button
                 onClick={handleSendMessage}
-                className="bg-gradient-to-r bg-light-teal text-white px-4 py-2 rounded-r-lg hover:opacity-90 transition"
+                className="animated-gradient-bg text-white px-4 py-2 rounded-r-lg hover:opacity-90 transition"
               >
                 <FaPaperPlane />
               </button>
             </div>
           </div>
-        </motion.div>
-      ) : (
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsOpen(true)}
-          className="bg-gradient-to-r bg-light-teal text-white p-4 rounded-full shadow-lg hover:shadow-xl transition"
-          aria-label="Open chat"
-        >
-          <FaRobot className="text-2xl" />
-        </motion.button>
-      )}
+          </motion.div>
+        ) : (
+          <motion.button
+            key="chat-open-button"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsOpen(true)}
+            className="animated-gradient-bg text-white p-4 rounded-full shadow-lg hover:shadow-xl transition"
+            aria-label="Open chat"
+          >
+            <FaRobot className="text-2xl" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

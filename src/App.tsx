@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   FaCode,
   FaBolt,
@@ -10,25 +10,44 @@ import {
   FaGithub,
   FaFacebook,
   FaPhone,
+  FaMoon,
+  FaSun,
 } from "react-icons/fa";
 import ChatBot from "./components/chatbot";
 
 const App = () => {
   // Section refs
-  const homeRef = useRef<any>(null);
-  const aboutRef = useRef<any>(null);
-  const projectsRef = useRef<any>(null);
-  const ServicesRef = useRef<any>(null);
-  const contactRef = useRef<any>(null);
+  const homeRef = useRef<HTMLElement | null>(null);
+  const aboutRef = useRef<HTMLElement | null>(null);
+  const projectsRef = useRef<HTMLElement | null>(null);
+  const servicesRef = useRef<HTMLElement | null>(null);
+  const contactRef = useRef<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDark, setIsDark] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 5000); // 5 seconds loading time
+    }, 2200);
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("portfolio-theme");
+    if (savedTheme === "dark") {
+      setIsDark(true);
+      return;
+    }
+    if (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setIsDark(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("portfolio-theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   const services = [
     {
@@ -87,6 +106,15 @@ const App = () => {
     }),
   };
 
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  };
+
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -101,7 +129,7 @@ const App = () => {
         { id: "home", ref: homeRef },
         { id: "about", ref: aboutRef },
         { id: "projects", ref: projectsRef },
-        { id: "services", ref: ServicesRef },
+        { id: "services", ref: servicesRef },
         { id: "contact", ref: contactRef },
       ];
 
@@ -127,7 +155,8 @@ const App = () => {
   }, []);
 
   // Smooth scroll function
-  const scrollToSection = (sectionRef: React.RefObject<HTMLElement>) => {
+  const scrollToSection = (sectionRef: React.RefObject<HTMLElement | null>) => {
+    if (!sectionRef.current) return;
     setMobileMenuOpen(false);
     window.scrollTo({
       top: sectionRef.current.offsetTop - 80,
@@ -140,13 +169,18 @@ const App = () => {
     { name: "Home", ref: homeRef, id: "home" },
     { name: "About & Skills", ref: aboutRef, id: "about" },
     { name: "Projects", ref: projectsRef, id: "projects" },
-    { name: "Services", ref: ServicesRef, id: "services" },
+    { name: "Services", ref: servicesRef, id: "services" },
     { name: "Contact", ref: contactRef, id: "contact" },
   ];
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-light-bg flex flex-col items-center justify-center z-50">
+      <div className="fixed inset-0 bg-light-bg flex flex-col items-center justify-center z-50 overflow-hidden">
+        <motion.div
+          className="pointer-events-none absolute h-72 w-72 rounded-full ambient-orb blur-3xl"
+          animate={shouldReduceMotion ? undefined : { x: [0, 80, 0], y: [0, -40, 0] }}
+          transition={shouldReduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        />
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -160,7 +194,7 @@ const App = () => {
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: "100%" }}
-            transition={{ duration: 4.5, ease: "linear" }}
+            transition={{ duration: 1.8, ease: "linear" }}
             className="h-1 bg-light-teal rounded-full mb-4"
           />
 
@@ -179,11 +213,17 @@ const App = () => {
 
   return (
     <>
-      <div className="w-full max-w-full overflow-x-hidden font-woff bg-light-bg">
+      <div className={`w-full max-w-full overflow-x-hidden font-woff bg-light-bg ${isDark ? "theme-dark" : ""}`}>
         {/* Navbar */}
-        <nav className="flex justify-between items-center bg-light-bg py-6 px-6 md:px-12 lg:px-24 border-b-2 w-[100%]  fixed top-0 z-50">
+        <motion.nav
+          initial={{ y: -28, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          aria-label="Main navigation"
+          className="flex justify-between items-center bg-light-bg/95 backdrop-blur-md py-6 px-6 md:px-12 lg:px-24 border-b-2 w-[100%] fixed top-0 z-50"
+        >
           <div className="text-2xl italic font-medium cursor-pointer">
-            <span className="text-light-font">KyawMgMgThu</span>
+            <span className="gradient-text font-display">KyawMgMgThu</span>
           </div>
 
           {/* Desktop Navigation */}
@@ -192,9 +232,9 @@ const App = () => {
               <li key={item.id}>
                 <button
                   onClick={() => scrollToSection(item.ref)}
-                  className={`link-btn transition-colors duration-300 ${
+                  className={`link-btn rounded-full px-3 py-1.5 transition-colors duration-300 ${
                     activeSection === item.id
-                      ? "text-light-teal font-medium"
+                      ? "text-light-teal bg-light-teal/10 font-medium"
                       : "text-light-font"
                   }`}
                 >
@@ -204,28 +244,45 @@ const App = () => {
             ))}
           </ul>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden text-light-font"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="38"
-              height="34"
-              viewBox="0 0 24 24"
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsDark((prev) => !prev)}
+              className="h-10 w-10 rounded-full border border-light-teal/30 text-light-teal hover:bg-light-teal/10 transition flex items-center justify-center"
+              aria-label="Toggle theme"
             >
-              <path
-                fill="currentColor"
-                d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"
-              />
-            </svg>
-          </button>
-        </nav>
+              {isDark ? <FaSun /> : <FaMoon />}
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden text-light-font"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="38"
+                height="34"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"
+                />
+              </svg>
+            </button>
+          </div>
+        </motion.nav>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 bg-light-bg bg-opacity-95 z-40 pt-24 px-6 overflow-y-auto animate-fade-in">
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden fixed inset-0 bg-light-bg/95 backdrop-blur-sm z-40 pt-24 px-6 overflow-y-auto"
+            >
             {/* Close Button */}
             <div className="absolute top-6 right-6">
               <button
@@ -257,11 +314,22 @@ const App = () => {
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Page Content */}
-        <div className=" bg-light-bg">
+        <main className="relative bg-light-bg">
+          <motion.div
+            className="pointer-events-none absolute left-[-8rem] top-40 h-72 w-72 rounded-full ambient-orb blur-3xl"
+            animate={shouldReduceMotion ? undefined : { x: [0, 60, 0], y: [0, -30, 0] }}
+            transition={shouldReduceMotion ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="pointer-events-none absolute right-[-8rem] top-[50rem] h-80 w-80 rounded-full ambient-orb blur-3xl"
+            animate={shouldReduceMotion ? undefined : { x: [0, -60, 0], y: [0, 40, 0] }}
+            transition={shouldReduceMotion ? undefined : { duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          />
           {/* Home Section */}
           <section
             ref={homeRef}
@@ -270,14 +338,23 @@ const App = () => {
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6 }}
               viewport={{ once: true }}
               className="order-1 lg:order-2 w-full lg:w-[50%] flex justify-center lg:justify-end px-0 lg:px-8"
             >
-              <img
+              <motion.img
                 className="w-full lg:w-[80%] max-w-md"
                 src="/image.png"
                 alt="Kyaw Mg Mg Thu"
+                animate={shouldReduceMotion ? undefined : { y: [0, -10, 0] }}
+                transition={shouldReduceMotion
+                  ? undefined
+                  : {
+                      duration: 4,
+                      repeat: Infinity,
+                      repeatType: "mirror",
+                      ease: "easeInOut",
+                    }}
               />
             </motion.div>
 
@@ -285,24 +362,36 @@ const App = () => {
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
               className="order-2 lg:order-1 w-full lg:w-[50%] leading-7 flex flex-col gap-4"
             >
-              <h5 className="text-xl text-light-teal">Hello, I'm </h5>
-              <h1 className="text-3xl font-extrabold">Kyaw Mg Mg Thu</h1>
-              <h1 className="text-3xl text-light-teal">
+              <span className="w-fit rounded-full bg-light-teal/10 text-light-teal px-4 py-1 text-sm">
+                Available for freelance projects
+              </span>
+              <h5 className="text-xl text-light-teal mt-1">Hello, I'm</h5>
+              <h1 className="text-3xl md:text-5xl font-extrabold font-display">Kyaw Mg Mg Thu</h1>
+              <h2 className="text-2xl md:text-4xl gradient-text">
                 Freelancer | Full-stack Developer
-              </h1>
-              <p className="italic text-lg text-light-font">
-                I am a Full-Stack Developer with expertise in React and Next.js
-                for the frontend, and PHP and Laravel for the backend. I
-                specialize in creating dynamic, scalable web applications with a
-                focus on user experience, performance, and security.
+              </h2>
+              <p className="italic text-lg text-light-font/85 max-w-2xl">
+                I design and build fast, elegant web products with React/Next.js
+                and Laravel. I also use AI-assisted workflows to ship features
+                faster while keeping code quality, performance, and SEO strong.
               </p>
-              <a href="mailto:mthu35997@gmail.com" className="btn w-fit mt-4">
-                Contact me!
-              </a>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <a href="mailto:mthu35997@gmail.com" className="btn w-fit animated-gradient-bg bg-[length:300%_300%]">
+                  Let's Work Together
+                </a>
+                <a
+                  href="https://github.com/KyawMgMgThu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-fit border border-light-teal text-light-teal px-4 py-3 rounded hover:bg-light-teal/10 transition"
+                >
+                  View GitHub
+                </a>
+              </div>
             </motion.div>
           </section>
 
@@ -310,15 +399,14 @@ const App = () => {
           <section ref={aboutRef} className="py-16 padding">
             <div className="max-w-6xl mx-auto font-wo">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                variants={sectionVariants}
+                initial="hidden"
+                whileInView="visible"
                 viewport={{ once: true }}
                 className="relative text-center mb-16"
               >
-                <h1 className="text-3xl font-bold text-light-font">
-                  About & Skills
-                </h1>
+                <h2 className="section-title">About & Skills</h2>
+                <p className="section-subtitle">Building reliable software with modern frontend and backend stacks.</p>
                 <motion.svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 200 20"
@@ -499,15 +587,14 @@ const App = () => {
           <section ref={projectsRef} className="py-16 padding  min-h-screen">
             <div className="max-w-6xl mx-auto">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                variants={sectionVariants}
+                initial="hidden"
+                whileInView="visible"
                 viewport={{ once: true }}
                 className="relative text-center mb-16"
               >
-                <h1 className="text-3xl font-bold text-light-font">
-                  Featured Projects
-                </h1>
+                <h2 className="section-title">Featured Projects</h2>
+                <p className="section-subtitle">Selected products focused on performance, usability, and clean engineering.</p>
                 <motion.svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 200 20"
@@ -534,11 +621,12 @@ const App = () => {
               <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
                 {/* Project 1 */}
                 <motion.div
-                  className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                   viewport={{ once: true }}
+                  whileHover={{ y: -8, scale: 1.01 }}
                 >
                   <div className="relative">
                     <img
@@ -610,11 +698,12 @@ const App = () => {
 
                 {/* Project 2 */}
                 <motion.div
-                  className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                   viewport={{ once: true }}
+                  whileHover={{ y: -8, scale: 1.01 }}
                 >
                   <div className="relative">
                     <img
@@ -692,11 +781,12 @@ const App = () => {
 
                 {/* Project 3 */}
                 <motion.div
-                  className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                   viewport={{ once: true }}
+                  whileHover={{ y: -8, scale: 1.01 }}
                 >
                   <div className="relative">
                     <img
@@ -773,11 +863,12 @@ const App = () => {
 
                 {/* Project 4 */}
                 <motion.div
-                  className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                   viewport={{ once: true }}
+                  whileHover={{ y: -8, scale: 1.01 }}
                 >
                   <div className="relative">
                     <img
@@ -870,18 +961,19 @@ const App = () => {
 
           {/* Services Section */}
           <section
-            ref={ServicesRef}
+            ref={servicesRef}
             className="py-10 padding min-h-screen  text-white"
           >
             <div className="max-w-6xl mx-auto">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                variants={sectionVariants}
+                initial="hidden"
+                whileInView="visible"
                 viewport={{ once: true }}
                 className="relative text-center mb-16"
               >
-                <h1 className="text-3xl font-bold text-light-font">Services</h1>
+                <h2 className="section-title">Services</h2>
+                <p className="section-subtitle">End-to-end product development from concept to production.</p>
                 <motion.svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 200 20"
@@ -915,8 +1007,10 @@ const App = () => {
                     whileInView="visible"
                     variants={cardVariants}
                     viewport={{ once: true }}
-                    className={`rounded-md p-8 border hover:scale-105 transition-transform duration-300 cursor-pointer 
-                bg-white shadow-lg overflow-hidden border-gray-200 text-light-font`}
+                    whileHover={{ y: -6, scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`glass-panel rounded-md p-8 transition-transform duration-300 cursor-pointer 
+                overflow-hidden text-light-font`}
                   >
                     <div className="flex justify-center mb-4 text-4xl">
                       {service.icon}
@@ -934,17 +1028,17 @@ const App = () => {
           </section>
 
           {/* Contact Section */}
-          <section ref={contactRef} className="py-16 px-4 min-h-screen flex items-center justify-center bg-white">
+          <section ref={contactRef} className="py-16 px-4 min-h-screen flex items-center justify-center bg-light-bg">
       <div className="max-w-2xl mx-auto text-center">
         {/* Heading with animated underline */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
           className="relative mb-20"
         >
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Contact Me</h2>
+          <h2 className="section-title">Contact Me</h2>
 
           <motion.svg
             xmlns="http://www.w3.org/2000/svg"
@@ -977,20 +1071,22 @@ const App = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
-          className="text-gray-700 my-4"
+          className="text-light-font/80 my-4 text-lg leading-8"
         >
-          Driven by creativity and a deep love for coding, I’m always on the lookout for innovative projects and inspiring collaborations. Got something in mind? Let’s build it together!
+          I turn ideas into production-ready web applications with clear timelines and clean execution. If you need a reliable developer for your next build, let’s discuss your project goals.
         </motion.p>
 
         <motion.a
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -2, scale: 1.04 }}
+        whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.6, delay: 0.2 }}
         viewport={{ once: true }}
           href="mailto:mthu35997@gmail.com"
-          className="inline-block bg-light-teal text-white px-6 py-2 rounded-md hover:bg-light-teal-light transition"
+          className="inline-block text-white px-6 py-2 rounded-md transition shadow-lg shadow-light-teal/20 animated-gradient-bg bg-[length:300%_300%]"
         >
-          Get in touch!
+          Start a Project
         </motion.a>
       </div>
     </section>
@@ -1026,9 +1122,9 @@ const App = () => {
               Kyaw Mg Mg Thu
             </p>
           </footer>
-        </div>
+        </main>
 
-        <ChatBot />
+        <ChatBot isDark={isDark} />
       </div>
     </>
   );

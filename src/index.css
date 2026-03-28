@@ -1,4 +1,5 @@
 /* Import Tailwind & Font Awesome */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap");
 @import "tailwindcss";
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 
@@ -15,7 +16,33 @@
   --color-dark-minty-teal: #05CE91;
   --color-dark-minty-teal-light: #57DCB4;
 
-  --font-woff: "EB Garamond", serif;
+  --font-woff: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Playfair Display", serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-woff);
+  background: #f8fafc;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.theme-dark {
+  --color-nav-bg: #090a0f;
+  --color-light-bg: #05070d;
+  --color-light-font: #e8ecff;
+  --color-light-teal: #49f2ba;
+  --color-light-teal-light: #8cf8d5;
+  color-scheme: dark;
 }
 
 /* ======= Utilities Layer ======= */
@@ -32,6 +59,83 @@
 
   .font-woff {
     font-family: var(--font-woff);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-light-teal to-light-teal-light bg-clip-text text-transparent;
+  }
+
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/60 shadow-xl;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-light-font;
+    font-family: var(--font-display);
+  }
+
+  .section-subtitle {
+    @apply text-light-font/70 text-base md:text-lg mt-3;
+  }
+
+  .animated-gradient-bg {
+    background: linear-gradient(-45deg, #2d7ef8, #3238e5, #6f4cff, #00c3ff);
+    background-size: 300% 300%;
+    animation: gradient-shift 12s ease infinite;
+  }
+
+  .ambient-orb {
+    background: radial-gradient(circle at center, color-mix(in oklab, var(--color-light-teal) 45%, transparent), transparent 70%);
+    animation: float-orb 10s ease-in-out infinite;
+  }
+}
+
+.theme-dark .glass-panel {
+  @apply bg-slate-900/55 border-slate-700/60 shadow-slate-950/40;
+}
+
+.theme-dark .animated-gradient-bg {
+  background: linear-gradient(-45deg, #0ea5e9, #06b6d4, #14b8a6, #22c55e);
+  background-size: 300% 300%;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float-orb {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-18px) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
