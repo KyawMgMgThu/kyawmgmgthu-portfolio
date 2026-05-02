@@ -220,19 +220,6 @@ const services = [
   },
 ];
 
-const improvements = [
-  localized("Add a short case-study page per featured project: challenge, solution, stack, and outcome.", "featured project တစ်ခုချင်းစီအတွက် challenge, solution, stack နဲ့ outcome ပါတဲ့ case study page တစ်ခုထည့်ပါ"),
-  localized("Include measurable impact signals (time saved, workflow speed, conversion lift, or reduced manual work).", "time saved, workflow speed, conversion lift လို measurable impact signals တွေထည့်ပါ"),
-  localized("Add trust signals: client feedback, references, or delivery snapshots when permission is available.", "client feedback, references, delivery snapshots လို trust signals တွေထည့်ပါ"),
-  localized("Keep one primary CTA path and make it visible in hero, project cards, and final contact block.", "primary CTA path တစ်ခုတည်းကို hero, project cards နဲ့ final contact block မှာ ထင်ရှားအောင်ထားပါ"),
-];
-
-const avoid = [
-  localized("Avoid showing junior experiments before production projects.", "production projects မတိုင်မီ junior experiments မပြပါနှင့်"),
-  localized("Avoid skill-only claims without shipped proof and project ownership details.", "shipped proof နဲ့ project ownership details မရှိဘဲ skill claim တွေမရေးပါနှင့်"),
-  localized("Avoid animation noise that lowers readability and slows first load.", "readability ကိုလျော့စေပြီး first load ကိုနှေးစေမယ့် animation noise တွေမသုံးပါနှင့်"),
-];
-
 const App = () => {
   const homeRef = useRef<HTMLElement | null>(null);
   const aboutRef = useRef<HTMLElement | null>(null);
@@ -293,14 +280,17 @@ const App = () => {
     }),
   };
 
-  const navItems = useMemo(() => [
-    { name: t(localized("Home", "မူလ")), ref: homeRef, id: "home" },
-    { name: t(localized("About", "အကြောင်းအရာ")), ref: aboutRef, id: "about" },
-    { name: t(localized("Projects", "Project များ")), ref: projectsRef, id: "projects" },
-    { name: t(localized("Stack", "နည်းပညာများ")), ref: stackRef, id: "stack" },
-    { name: t(localized("Services", "ဝန်ဆောင်မှုများ")), ref: servicesRef, id: "services" },
-    { name: t(localized("Contact", "ဆက်သွယ်ရန်")), ref: contactRef, id: "contact" },
-  ], [t]);
+  const navItems = useMemo(
+    () => [
+      { name: t(localized("Home", "မူလ")), ref: homeRef, id: "home" },
+      { name: t(localized("Projects", "Project များ")), ref: projectsRef, id: "projects" },
+      { name: t(localized("About", "အကြောင်းအရာ")), ref: aboutRef, id: "about" },
+      { name: t(localized("Stack", "နည်းပညာများ")), ref: stackRef, id: "stack" },
+      { name: t(localized("Services", "ဝန်ဆောင်မှုများ")), ref: servicesRef, id: "services" },
+      { name: t(localized("Contact", "ဆက်သွယ်ရန်")), ref: contactRef, id: "contact" },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -366,12 +356,12 @@ const App = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
         aria-label="Main navigation"
-        className="fixed inset-x-0 top-0 z-50 border-b border-light-font/10 bg-light-bg/90 px-5 py-4 backdrop-blur-xl md:px-10 lg:px-16"
+        className="fixed inset-x-0 top-0 z-50 border-b border-light-font/10 bg-light-bg/90 px-4 py-4 backdrop-blur-xl sm:px-5 md:px-10 lg:px-16"
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <button
             onClick={() => scrollToSection(homeRef)}
-            className="text-left text-base font-bold tracking-tight text-light-font"
+            className="min-w-0 max-w-[9rem] truncate text-left text-base font-bold tracking-tight text-light-font sm:max-w-none"
           >
             Kyaw Mg Mg Thu
           </button>
@@ -402,10 +392,11 @@ const App = () => {
             </a>
             <button
               onClick={() => setLanguage((prev) => (prev === "en" ? "my" : "en"))}
-              className="hidden rounded-full border border-light-font/10 px-3 py-2 text-xs font-bold text-light-font transition hover:border-light-teal hover:text-light-teal sm:inline-flex"
-              aria-label="Toggle language"
+              className="inline-flex h-10 min-w-12 items-center justify-center rounded-full border border-light-font/10 px-3 text-xs font-bold text-light-font transition hover:border-light-teal hover:text-light-teal"
+              aria-label={language === "en" ? "Switch to Myanmar language" : "Switch to English language"}
             >
-              {language === "en" ? "EN / မြန်မာ" : "မြန်မာ / EN"}
+              <span className="hidden sm:inline">{language === "en" ? "EN / မြန်မာ" : "မြန်မာ / EN"}</span>
+              <span className="sm:hidden">{language === "en" ? "MY" : "EN"}</span>
             </button>
             <button
               onClick={() => setIsDark((prev) => !prev)}
@@ -455,13 +446,13 @@ const App = () => {
       </AnimatePresence>
 
       <main>
-        <section ref={homeRef} className="section-shell pt-32 md:pt-40">
+        <section ref={homeRef} className="section-shell pt-28 md:pt-40">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <motion.div
               initial={{ opacity: 0, y: 26 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: "easeOut" }}
-              className="max-w-2xl"
+              className="order-2 max-w-2xl lg:order-1"
             >
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-light-font/10 bg-white/70 px-4 py-2 text-sm font-semibold text-light-font/75 shadow-sm theme-surface">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
@@ -503,10 +494,21 @@ const App = () => {
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.55, delay: 0.08, ease: "easeOut" }}
-              className="relative mx-auto w-full max-w-xl lg:max-w-none"
+              className="order-1 relative mx-auto w-full max-w-xl lg:order-2 lg:max-w-none"
             >
               <div className="hero-visual relative min-h-[390px] overflow-hidden rounded-[1.75rem] border border-light-font/10 bg-white/75 p-4 shadow-2xl shadow-slate-950/10 theme-surface sm:min-h-[500px] md:p-6">
                 <div className="hero-grid absolute inset-0" />
+                <div className="hero-photo-badge absolute left-4 top-4 z-30 flex items-center gap-3 rounded-xl border border-light-font/10 bg-light-bg/90 p-2 pr-3 text-light-font shadow-lg shadow-slate-950/10 backdrop-blur-md sm:left-5 sm:top-5">
+                  <img
+                    src="/me.jpg"
+                    alt="Kyaw Mg Mg Thu"
+                    className="h-12 w-12 rounded-full border border-light-font/10 object-cover sm:h-14 sm:w-14"
+                  />
+                  <div className="hidden sm:block">
+                    <p className="text-sm font-extrabold leading-tight">Kyaw Mg Mg Thu</p>
+                    <p className="mt-1 text-xs font-semibold text-light-font/55">Full-stack developer</p>
+                  </div>
+                </div>
                 <motion.div
                   className="hero-aura absolute left-1/2 top-1/2 h-[62%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full"
                   animate={shouldReduceMotion ? undefined : { scale: [1, 1.06, 1], opacity: [0.65, 0.9, 0.65] }}
@@ -527,7 +529,9 @@ const App = () => {
                 {heroVisualTags.map((tag) => (
                   <div
                     key={t(tag.label)}
-                    className="hero-orbit pointer-events-none absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 sm:block"
+                    className={`hero-orbit pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 ${
+                      tag.mobileVisible ? "block" : "hidden sm:block"
+                    }`}
                     style={
                       {
                         "--orbit-size": tag.orbitSize,
@@ -541,7 +545,7 @@ const App = () => {
                       <div className={`hero-orbit-badge-wrap ${shouldReduceMotion ? "" : "is-animated"}`}>
                         <div className="hero-tech-tag inline-flex items-center gap-2 rounded-full border border-light-font/10 bg-light-bg/88 px-3 py-2 text-xs font-bold text-light-font shadow-lg shadow-slate-950/10 backdrop-blur-md">
                           <span className="text-light-teal">{tag.icon}</span>
-                          {t(tag.label)}
+                          <span className="hero-tech-label">{t(tag.label)}</span>
                         </div>
                       </div>
                     </div>
@@ -564,38 +568,7 @@ const App = () => {
           </div>
         </section>
 
-        <section ref={aboutRef} className="section-shell border-t border-light-font/10">
-          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-            <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <p className="section-kicker">About</p>
-              <h2 className="section-title">Full-stack delivery with production responsibility.</h2>
-            </motion.div>
-            <motion.div
-              variants={sectionVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <p className="text-xl leading-9 text-light-font/75">
-                I build and own complete web products across frontend, backend,
-                database, and infrastructure. My strongest work is production delivery:
-                translating business goals into reliable systems, shipping them
-                independently, and supporting practical operation after launch.
-              </p>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {["Independent ownership", "Production deployment", "Business workflow thinking"].map((item) => (
-                  <div key={item} className="rounded-lg border border-light-font/10 bg-white/70 p-4 theme-surface">
-                    <FaCode className="text-light-teal" />
-                    <p className="mt-3 text-sm font-bold text-light-font">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        <section ref={projectsRef} className="section-shell bg-white/45 theme-band">
+        <section ref={projectsRef} className="section-shell border-y border-light-font/10 bg-white/45 theme-band">
           <div className="mx-auto max-w-7xl">
             <motion.div
               variants={sectionVariants}
@@ -736,6 +709,37 @@ const App = () => {
           </div>
         </section>
 
+        <section ref={aboutRef} className="section-shell">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              <p className="section-kicker">About</p>
+              <h2 className="section-title">Full-stack delivery with production responsibility.</h2>
+            </motion.div>
+            <motion.div
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <p className="text-xl leading-9 text-light-font/75">
+                I build and own complete web products across frontend, backend,
+                database, and infrastructure. My strongest work is production delivery:
+                translating business goals into reliable systems, shipping them
+                independently, and supporting practical operation after launch.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {["Independent ownership", "Production deployment", "Business workflow thinking"].map((item) => (
+                  <div key={item} className="rounded-lg border border-light-font/10 bg-white/70 p-4 theme-surface">
+                    <FaCode className="text-light-teal" />
+                    <p className="mt-3 text-sm font-bold text-light-font">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
         <section ref={stackRef} className="section-shell">
           <div className="mx-auto max-w-7xl">
             <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-3xl">
@@ -864,7 +868,7 @@ const App = () => {
         </p>
       </footer>
 
-      <ChatBot isDark={isDark} />
+      <ChatBot isDark={isDark} language={language} />
     </div>
   );
 };

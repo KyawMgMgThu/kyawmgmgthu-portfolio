@@ -161,21 +161,23 @@ const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) =>
 
     setTimeout(() => {
       const botResponse = getBotResponse(currentInput);
+      const response = botResponse.response;
 
       if (botResponse.isCard && botResponse.cardData) {
+        const intro = Array.isArray(response) ? response.join(" ") : response;
         setMessages((prev) => [
           ...prev,
-          { text: botResponse.response as string, sender: "bot" },
+          { text: intro, sender: "bot" },
           { text: "", sender: "bot", isCard: true, cardData: botResponse.cardData },
         ]);
-      } else if (Array.isArray(botResponse.response)) {
-        const botMessages = botResponse.response.map((text) => ({
+      } else if (Array.isArray(response)) {
+        const botMessages = response.map((text) => ({
           text,
           sender: "bot" as const,
         }));
         setMessages((prev) => [...prev, ...botMessages]);
       } else {
-        setMessages((prev) => [...prev, { text: botResponse.response, sender: "bot" }]);
+        setMessages((prev) => [...prev, { text: response, sender: "bot" }]);
       }
 
       setIsTyping(false);
