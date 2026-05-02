@@ -1,47 +1,267 @@
-import { useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, RefObject } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import {
+  FaArrowRight,
+  FaAws,
   FaCode,
-  FaBolt,
-  FaUsersCog,
-  FaHeart,
-  FaLightbulb,
-  FaMobileAlt,
-  FaGithub,
+  FaCubes,
+  FaDatabase,
+  FaDocker,
+  FaExternalLinkAlt,
   FaFacebook,
-  FaPhone,
+  FaGithub,
+  FaHeart,
+  FaLaravel,
   FaMoon,
+  FaPhone,
+  FaReact,
+  FaRocket,
+  FaServer,
   FaSun,
+  FaTools,
 } from "react-icons/fa";
 import ChatBot from "./components/chatbot";
 
+type Language = "en" | "my";
+type LocalizedText = Record<Language, string>;
+
+const localized = (en: string, my: string): LocalizedText => ({ en, my });
+
+const stats = [
+  { value: "5+", label: localized("Production systems shipped", "Production system ၂ ခု တည်ဆောက်ပြီး") },
+  { value: "End-to-end", label: localized("Frontend, backend, deployment", "Frontend, backend, deployment အဆုံးထိ") },
+  { value: "100%", label: localized("Built independently", "အပြည့်အဝ ကိုယ်တိုင်တည်ဆောက်") },
+];
+
+const heroVisualTags = [
+  {
+    label: localized("React UI", "React UI"),
+    icon: <FaReact />,
+    orbitSize: "86%",
+    mobileVisible: true,
+    duration: 18,
+    delay: "-2s",
+  },
+  {
+    label: localized("Laravel API", "Laravel API"),
+    icon: <FaLaravel />,
+    orbitSize: "86%",
+    mobileVisible: true,
+    duration: 18,
+    delay: "-8s",
+  },
+  {
+    label: localized("AWS Deploy", "AWS Deploy"),
+    icon: <FaAws />,
+    orbitSize: "86%",
+    mobileVisible: true,
+    duration: 18,
+    delay: "-14s",
+  },
+  {
+    label: localized("Docker", "Docker"),
+    icon: <FaDocker />,
+    orbitSize: "86%",
+    mobileVisible: true,
+    duration: 18,
+    delay: "-20s",
+  },
+  {
+    label: localized("Kubernetes", "Kubernetes"),
+    icon: <FaCubes />,
+    orbitSize: "64%",
+    mobileVisible: true,
+    duration: 13,
+    delay: "-4s",
+  },
+  {
+    label: localized("CI/CD Pipeline", "CI/CD Pipeline"),
+    icon: <FaServer />,
+    orbitSize: "64%",
+    mobileVisible: true,
+    duration: 13,
+    delay: "-10s",
+  },
+];
+
+const projects = [
+  {
+    title: localized("Hospital Information Management System (HIMS)", "Hospital Information Management System (HIMS)"),
+    domain: localized("Healthcare Operations", "ကျန်းမာရေး လုပ်ငန်းစဉ်"),
+    description: localized(
+      "A web-based hospital operations platform built independently to centralize patient registration, appointments, triage, consultation, pharmacy, billing, rooms, and multi-hospital administration in one secure system.",
+      "လူနာမှတ်ပုံတင်ခြင်း၊ appointment, triage, consultation, pharmacy, billing, rooms နဲ့ multi-hospital administration ကို system တစ်ခုတည်းထဲမှာ စုစည်းပေးတဲ့ web-based hospital platform ကို ကိုယ်တိုင်တည်ဆောက်ထားပါတယ်။",
+    ),
+    highlights: [
+      localized("Built complete hospital workflows across registration, appointments, nurse triage, doctor consultation, pharmacy, billing, rooms, wards, and inpatient operations", "registration ကနေ appointment, triage, doctor consultation, pharmacy, billing, rooms, wards နဲ့ inpatient workflow အထိ hospital flow အပြည့်တည်ဆောက်ထားပါတယ်"),
+      localized("Implemented multi-hospital support with super admin, hospital admin, and role-based staff access", "super admin, hospital admin နဲ့ role-based staff access ပါဝင်တဲ့ multi-hospital support ကို တည်ဆောက်ထားပါတယ်"),
+      localized("Designed structured data relationships for patients, visits, prescriptions, payments, rooms, and hospital branches", "patients, visits, prescriptions, payments, rooms နဲ့ branch hospitals အတွက် structured data relationships ကို design လုပ်ထားပါတယ်"),
+      localized("Delivered a practical clinical and operational system intended for real hospital environments, not a demo-only build", "demo project မဟုတ်ဘဲ တကယ့် hospital environment အတွက် အသုံးချနိုင်မယ့် system အဖြစ်တည်ဆောက်ထားပါတယ်"),
+    ],
+    stack: ["Laravel 12", "PHP", "Blade", "Bootstrap 5", "MySQL", "Vite"],
+  },
+  {
+    title: localized("Qwerty Ticket System", "Qwerty Ticket System"),
+    domain: localized("Service Desk Operations", "Service Desk လုပ်ငန်းစဉ်"),
+    description: localized(
+      "A Laravel-based service desk platform built independently for managing support tickets, projects, users, public request forms, configurable workflows, and project communication from one secure workspace.",
+      "support tickets, projects, users, public request forms, configurable workflows နဲ့ project communication ကို secure workspace တစ်ခုထဲမှာ စီမံခန့်ခွဲနိုင်ဖို့ Laravel-based service desk platform ကို ကိုယ်တိုင်တည်ဆောက်ထားပါတယ်။",
+    ),
+    highlights: [
+      localized("Implemented role-based access for admins, project managers, clients, internal staff, and third-party providers", "admins, project managers, clients, internal staff နဲ့ third-party providers အတွက် role-based access ကို တည်ဆောက်ထားပါတယ်"),
+      localized("Built one-time public submission links, read-only public tracking, attachments, advanced filters, and project-based ticket visibility", "one-time public submission links, read-only public tracking, attachments, advanced filters နဲ့ project-based ticket visibility ပါဝင်ပါတယ်"),
+      localized("Added project chat, general chat approval flows, unread counts, read sync, and configurable ticket settings", "project chat, general chat approval flows, unread counts, read sync နဲ့ configurable ticket settings ကို ထည့်သွင်းထားပါတယ်"),
+      localized("Covered core workflows with automated tests: 45 tests passed with 272 assertions", "core workflows အတွက် automated tests ထည့်ထားပြီး 45 tests passed with 272 assertions ရရှိထားပါတယ်"),
+    ],
+    stack: ["Laravel 12", "PHP 8.4", "Blade", "Tailwind CSS", "JavaScript", "SQLite", "PHPUnit", "Vite"],
+  },
+];
+
+const earlyProjects = [
+  {
+    title: localized("QR Code Digital Menu System", "QR Code Digital Menu System"),
+    image: "/logos/digital_menu.jpg",
+    description: localized(
+      "A contactless restaurant menu experiment for browsing restaurant items through QR codes, with menu management concepts and business-facing UI practice.",
+      "QR code နဲ့ restaurant menu items တွေကို ကြည့်နိုင်ဖို့ contactless menu experiment တစ်ခုဖြစ်ပြီး menu management နဲ့ business-facing UI practice အတွက် တည်ဆောက်ထားပါတယ်။",
+    ),
+    stack: ["Laravel 10", "Filament", "Livewire", "MySQL", "AWS", "EC2"],
+    link: "https://github.com/KyawMgMgThu/DIgital_menu",
+  },
+  {
+    title: localized("Personal Portfolio", "Personal Portfolio"),
+    image: "/logos/portfolio.png",
+    description: localized(
+      "An early portfolio build focused on responsive layouts, motion, and project presentation while practicing React and modern frontend structure.",
+      "React နဲ့ modern frontend structure ကို လေ့ကျင့်စဉ် responsive layout, motion နဲ့ project presentation ကို focus လုပ်ထားတဲ့ early portfolio build ဖြစ်ပါတယ်။",
+    ),
+    stack: ["React 19", "TypeScript", "Vite", "Tailwind CSS", "Framer Motion"],
+    link: "https://github.com/KyawMgMgThu/kyawmgmgthu-portfolio",
+  },
+  {
+    title: localized("Kid's Learning Website", "Kid's Learning Website"),
+    image: "/logos/kid-learning.png",
+    description: localized(
+      "An interactive learning website experiment for children, including drawing, speech tools, games, animations, and basic educational flows.",
+      "ကလေးများအတွက် drawing, speech tools, games, animations နဲ့ basic educational flows ပါဝင်တဲ့ interactive learning website experiment ဖြစ်ပါတယ်။",
+    ),
+    stack: ["React", "Bootstrap", "React-Speech", "MUI", "Canvas", "React Router"],
+    link: "https://github.com/KyawMgMgThu/KG_Learning_website",
+  },
+  {
+    title: localized("Kyaw Gyi POS System", "Kyaw Gyi POS System"),
+    image: "/logos/pos.jpg",
+    description: localized(
+      "A junior-stage POS system experiment for practicing inventory, sales reports, receipts, PDF export, and Laravel plus React integration.",
+      "inventory, sales reports, receipts, PDF export နဲ့ Laravel + React integration ကို လေ့ကျင့်ဖို့ တည်ဆောက်ထားတဲ့ junior-stage POS experiment ဖြစ်ပါတယ်။",
+    ),
+    stack: ["Laravel 10", "React", "Vite", "Bootstrap 5", "SweetAlert2", "Axios"],
+    link: "https://github.com/KyawMgMgThu/pos_system",
+  },
+];
+
+const techStack = [
+  {
+    category: localized("Frontend", "Frontend"),
+    icon: <FaReact />,
+    items: [localized("React", "React"), localized("Tailwind CSS", "Tailwind CSS"), localized("TypeScript", "TypeScript"), localized("Responsive UI", "Responsive UI"), localized("Framer Motion", "Framer Motion")],
+  },
+  {
+    category: localized("Backend", "Backend"),
+    icon: <FaLaravel />,
+    items: [localized("Laravel", "Laravel"), localized("PHP", "PHP"), localized("REST APIs", "REST APIs"), localized("MySQL", "MySQL"), localized("Authentication", "Authentication")],
+  },
+  {
+    category: localized("DevOps", "DevOps"),
+    icon: <FaServer />,
+    items: [localized("AWS", "AWS"), localized("Docker", "Docker"), localized("EC2", "EC2"), localized("Domain & Hosting", "Domain & Hosting"), localized("Production Deployments", "Production Deployments")],
+  },
+  {
+    category: localized("Tools", "Tools"),
+    icon: <FaTools />,
+    items: [localized("Git", "Git"), localized("GitHub", "GitHub"), localized("Vite", "Vite"), localized("NPM", "NPM"), localized("Linux Basics", "Linux Basics")],
+  },
+];
+
+const services = [
+  {
+    title: localized("Build Business Web Systems", "Business web systems တည်ဆောက်ခြင်း"),
+    description: localized(
+      "Turn business requirements into complete web systems with user journeys, admin tools, backend logic, and production release.",
+      "business requirement တွေကို user journey, admin tools, backend logic နဲ့ production release ပါဝင်တဲ့ complete web system အဖြစ်ပြောင်းပေးနိုင်ပါတယ်။",
+    ),
+    icon: <FaRocket />,
+  },
+  {
+    title: localized("Modernize Existing Websites", "ရှိပြီးသား website များကို ခေတ်မီအောင် ပြောင်းခြင်း"),
+    description: localized(
+      "Upgrade outdated websites into fast, responsive, conversion-focused products with modern UX and clean component architecture.",
+      "outdated website များကို fast, responsive, conversion-focused product အဖြစ် modern UX နဲ့ clean component architecture ဖြင့် ပြန်လည်တည်ဆောက်ပေးနိုင်ပါတယ်။",
+    ),
+    icon: <FaReact />,
+  },
+  {
+    title: localized("Laravel Backend Development", "Laravel backend development"),
+    description: localized(
+      "Design scalable Laravel backends with robust data models, API design, auth, and maintainable business workflows.",
+      "robust data models, API design, auth နဲ့ maintainable business workflows ပါဝင်တဲ့ scalable Laravel backend များကို တည်ဆောက်ပေးနိုင်ပါတယ်။",
+    ),
+    icon: <FaLaravel />,
+  },
+  {
+    title: localized("Deployment & Hosting", "Deployment & Hosting"),
+    description: localized(
+      "Move projects from local development to reliable production using AWS, Docker, domains, hosting, and stable release practices.",
+      "AWS, Docker, domains, hosting နဲ့ stable release practices အသုံးပြုပြီး local development ကနေ reliable production အထိ တင်ပေးနိုင်ပါတယ်။",
+    ),
+    icon: <FaAws />,
+  },
+];
+
+const improvements = [
+  localized("Add a short case-study page per featured project: challenge, solution, stack, and outcome.", "featured project တစ်ခုချင်းစီအတွက် challenge, solution, stack နဲ့ outcome ပါတဲ့ case study page တစ်ခုထည့်ပါ"),
+  localized("Include measurable impact signals (time saved, workflow speed, conversion lift, or reduced manual work).", "time saved, workflow speed, conversion lift လို measurable impact signals တွေထည့်ပါ"),
+  localized("Add trust signals: client feedback, references, or delivery snapshots when permission is available.", "client feedback, references, delivery snapshots လို trust signals တွေထည့်ပါ"),
+  localized("Keep one primary CTA path and make it visible in hero, project cards, and final contact block.", "primary CTA path တစ်ခုတည်းကို hero, project cards နဲ့ final contact block မှာ ထင်ရှားအောင်ထားပါ"),
+];
+
+const avoid = [
+  localized("Avoid showing junior experiments before production projects.", "production projects မတိုင်မီ junior experiments မပြပါနှင့်"),
+  localized("Avoid skill-only claims without shipped proof and project ownership details.", "shipped proof နဲ့ project ownership details မရှိဘဲ skill claim တွေမရေးပါနှင့်"),
+  localized("Avoid animation noise that lowers readability and slows first load.", "readability ကိုလျော့စေပြီး first load ကိုနှေးစေမယ့် animation noise တွေမသုံးပါနှင့်"),
+];
+
 const App = () => {
-  // Section refs
   const homeRef = useRef<HTMLElement | null>(null);
   const aboutRef = useRef<HTMLElement | null>(null);
   const projectsRef = useRef<HTMLElement | null>(null);
+  const stackRef = useRef<HTMLElement | null>(null);
   const servicesRef = useRef<HTMLElement | null>(null);
   const contactRef = useRef<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDark, setIsDark] = useState(false);
+  const [language, setLanguage] = useState<Language>("en");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2200);
-
+    const timer = setTimeout(() => setIsLoading(false), 900);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("portfolio-theme");
+    const savedLanguage = localStorage.getItem("portfolio-language") as Language | null;
     if (savedTheme === "dark") {
       setIsDark(true);
-      return;
-    }
-    if (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    } else if (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches) {
       setIsDark(true);
+    }
+    if (savedLanguage === "en" || savedLanguage === "my") {
+      setLanguage(savedLanguage);
     }
   }, []);
 
@@ -49,193 +269,122 @@ const App = () => {
     localStorage.setItem("portfolio-theme", isDark ? "dark" : "light");
   }, [isDark]);
 
-  const services = [
-    {
-      id: 1,
-      title: "Full Stack Web Development",
-      contact:
-        "I craft dynamic and interactive features for your website using modern JavaScript frameworks like React.js || Next.js and  backend technologies such as PHP/Laravel.",
-      icon: <FaUsersCog />,
-    },
-    {
-      id: 2,
-      title: "Responsive",
-      contact:
-        "I can make a responsive website for mobile phone, tablet, laptop and other devices",
-      icon: <FaMobileAlt />,
-    },
-    {
-      id: 3,
-      title: "Clean Coding",
-      contact: "I can write clean code using MVC Pattern",
-      icon: <FaCode />,
-    },
-    {
-      id: 4,
-      title: "Communication",
-      contact: "I can communicate with senior developers",
-      icon: <FaUsersCog />,
-    },
-    {
-      id: 5,
-      title: "Interactive Features",
-      contact:
-        "I build dynamic and engaging website features using React.js || Next.js and PHP/Laravel to enhance user experience and interactivity.",
-      icon: <FaBolt />,
-    },
+  useEffect(() => {
+    localStorage.setItem("portfolio-language", language);
+  }, [language]);
 
-    {
-      id: 6,
-      title: "Problem Solving",
-      contact:
-        "I approach development with strong analytical thinking, solving complex problems with efficient, scalable solutions.",
-      icon: <FaLightbulb />,
-    },
-  ];
+  const t = useCallback((value: LocalizedText) => value[language], [language]);
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    }),
-  };
-
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 24 },
+  const sectionVariants: Variants = {
+    hidden: { opacity: 0, y: 22 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
+      transition: { duration: 0.5, ease: "easeOut" },
     },
   };
 
-  // Mobile menu state
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const cardVariants: Variants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.08, duration: 0.45, ease: "easeOut" },
+    }),
+  };
 
-  // Active section state
-  const [activeSection, setActiveSection] = useState("home");
+  const navItems = useMemo(() => [
+    { name: t(localized("Home", "မူလ")), ref: homeRef, id: "home" },
+    { name: t(localized("About", "အကြောင်းအရာ")), ref: aboutRef, id: "about" },
+    { name: t(localized("Projects", "Project များ")), ref: projectsRef, id: "projects" },
+    { name: t(localized("Stack", "နည်းပညာများ")), ref: stackRef, id: "stack" },
+    { name: t(localized("Services", "ဝန်ဆောင်မှုများ")), ref: servicesRef, id: "services" },
+    { name: t(localized("Contact", "ဆက်သွယ်ရန်")), ref: contactRef, id: "contact" },
+  ], [t]);
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = window.scrollY + 120;
 
-      const sections = [
-        { id: "home", ref: homeRef },
-        { id: "about", ref: aboutRef },
-        { id: "projects", ref: projectsRef },
-        { id: "services", ref: servicesRef },
-        { id: "contact", ref: contactRef },
-      ];
-
-      for (const section of sections) {
+      for (const section of navItems) {
         const element = section.ref.current;
-        if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetHeight = element.offsetHeight;
+        if (!element) continue;
 
-          if (
-            scrollPosition >= offsetTop &&
-            scrollPosition < offsetTop + offsetHeight
-          ) {
-            setActiveSection(section.id);
-            break;
-          }
+        if (
+          scrollPosition >= element.offsetTop &&
+          scrollPosition < element.offsetTop + element.offsetHeight
+        ) {
+          setActiveSection(section.id);
+          break;
         }
       }
     };
 
     window.addEventListener("scroll", handleScroll);
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [navItems]);
 
-  // Smooth scroll function
-  const scrollToSection = (sectionRef: React.RefObject<HTMLElement | null>) => {
+  const scrollToSection = (sectionRef: RefObject<HTMLElement | null>) => {
     if (!sectionRef.current) return;
     setMobileMenuOpen(false);
     window.scrollTo({
-      top: sectionRef.current.offsetTop - 80,
+      top: sectionRef.current.offsetTop - 76,
       behavior: "smooth",
     });
   };
 
-  // Navigation items config
-  const navItems = [
-    { name: "Home", ref: homeRef, id: "home" },
-    { name: "About & Skills", ref: aboutRef, id: "about" },
-    { name: "Projects", ref: projectsRef, id: "projects" },
-    { name: "Services", ref: servicesRef, id: "services" },
-    { name: "Contact", ref: contactRef, id: "contact" },
-  ];
-
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-light-bg flex flex-col items-center justify-center z-50 overflow-hidden">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-light-bg">
         <motion.div
-          className="pointer-events-none absolute h-72 w-72 rounded-full ambient-orb blur-3xl"
-          animate={shouldReduceMotion ? undefined : { x: [0, 80, 0], y: [0, -40, 0] }}
-          transition={shouldReduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
           className="text-center"
         >
-          <div className="text-4xl italic font-medium mb-4">
-            <span className="text-light-font">KyawMgMgThu</span>
+          <p className="text-sm font-semibold uppercase tracking-[0.26em] text-light-teal">
+            Kyaw Mg Mg Thu
+          </p>
+          <div className="mt-4 h-1 w-48 overflow-hidden rounded-full bg-light-font/10">
+            <motion.div
+              className="h-full bg-light-teal"
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.75, ease: "easeOut" }}
+            />
           </div>
-
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 1.8, ease: "linear" }}
-            className="h-1 bg-light-teal rounded-full mb-4"
-          />
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="text-light-font"
-          >
-            Loading Portfolio...
-          </motion.p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <>
-      <div className={`w-full max-w-full overflow-x-hidden font-woff bg-light-bg ${isDark ? "theme-dark" : ""}`}>
-        {/* Navbar */}
-        <motion.nav
-          initial={{ y: -28, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
-          aria-label="Main navigation"
-          className="flex justify-between items-center bg-light-bg/95 backdrop-blur-md py-6 px-6 md:px-12 lg:px-24 border-b-2 w-[100%] fixed top-0 z-50"
-        >
-          <div className="text-2xl italic font-medium cursor-pointer">
-            <span className="gradient-text font-display">KyawMgMgThu</span>
-          </div>
+    <div className={`min-h-screen overflow-x-hidden bg-light-bg font-woff ${isDark ? "theme-dark" : ""}`}>
+      <motion.nav
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        aria-label="Main navigation"
+        className="fixed inset-x-0 top-0 z-50 border-b border-light-font/10 bg-light-bg/90 px-5 py-4 backdrop-blur-xl md:px-10 lg:px-16"
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <button
+            onClick={() => scrollToSection(homeRef)}
+            className="text-left text-base font-bold tracking-tight text-light-font"
+          >
+            Kyaw Mg Mg Thu
+          </button>
 
-          {/* Desktop Navigation */}
-          <ul className="hidden lg:flex gap-8 text-lg font-normal text-light-font">
+          <ul className="hidden items-center gap-1 lg:flex">
             {navItems.map((item) => (
               <li key={item.id}>
                 <button
                   onClick={() => scrollToSection(item.ref)}
-                  className={`link-btn rounded-full px-3 py-1.5 transition-colors duration-300 ${
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                     activeSection === item.id
-                      ? "text-light-teal bg-light-teal/10 font-medium"
-                      : "text-light-font"
+                      ? "bg-light-font text-light-bg"
+                      : "text-light-font/70 hover:bg-light-font/5 hover:text-light-font"
                   }`}
                 >
                   {item.name}
@@ -244,69 +393,56 @@ const App = () => {
             ))}
           </ul>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <a
+              href="mailto:mthu35997@gmail.com"
+              className="hidden rounded-full bg-light-teal px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-light-teal/20 transition hover:bg-light-teal-light md:inline-flex"
+            >
+              Hire Me
+            </a>
+            <button
+              onClick={() => setLanguage((prev) => (prev === "en" ? "my" : "en"))}
+              className="hidden rounded-full border border-light-font/10 px-3 py-2 text-xs font-bold text-light-font transition hover:border-light-teal hover:text-light-teal sm:inline-flex"
+              aria-label="Toggle language"
+            >
+              {language === "en" ? "EN / မြန်မာ" : "မြန်မာ / EN"}
+            </button>
             <button
               onClick={() => setIsDark((prev) => !prev)}
-              className="h-10 w-10 rounded-full border border-light-teal/30 text-light-teal hover:bg-light-teal/10 transition flex items-center justify-center"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-light-font/10 text-light-font transition hover:border-light-teal hover:text-light-teal"
               aria-label="Toggle theme"
             >
               {isDark ? <FaSun /> : <FaMoon />}
             </button>
-
-            {/* Mobile Menu Button */}
             <button
-              className="lg:hidden text-light-font"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-light-font/10 text-light-font lg:hidden"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label="Open menu"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="38"
-                height="34"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="currentColor"
-                  d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"
-                />
-              </svg>
+              <span className="h-0.5 w-5 bg-current shadow-[0_6px_0_current,0_-6px_0_current]" />
             </button>
           </div>
-        </motion.nav>
+        </div>
+      </motion.nav>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 bg-light-bg/95 backdrop-blur-sm z-40 pt-24 px-6 overflow-y-auto"
-            >
-            {/* Close Button */}
-            <div className="absolute top-6 right-6">
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-light-font text-3xl focus:outline-none"
-                aria-label="Close menu"
-              >
-                &times;
-              </button>
-            </div>
-
-            {/* Navigation Links */}
-            <ul className="flex flex-col gap-6 text-xl">
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-x-0 top-[73px] z-40 border-b border-light-font/10 bg-light-bg/95 px-5 py-5 backdrop-blur-xl lg:hidden"
+          >
+            <ul className="mx-auto flex max-w-7xl flex-col gap-2">
               {navItems.map((item) => (
                 <li key={item.id}>
                   <button
-                    onClick={() => {
-                      scrollToSection(item.ref);
-                      setMobileMenuOpen(false); // close menu after click
-                    }}
-                    className={`w-full text-left py-3 transition-all duration-200 ${
+                    onClick={() => scrollToSection(item.ref)}
+                    className={`w-full rounded-lg px-4 py-3 text-left text-base font-medium transition ${
                       activeSection === item.id
-                        ? "text-light-teal font-medium"
-                        : "text-light-font"
+                        ? "bg-light-font text-light-bg"
+                        : "text-light-font/75 hover:bg-light-font/5"
                     }`}
                   >
                     {item.name}
@@ -314,819 +450,422 @@ const App = () => {
                 </li>
               ))}
             </ul>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Page Content */}
-        <main className="relative bg-light-bg">
-          <motion.div
-            className="pointer-events-none absolute left-[-8rem] top-40 h-72 w-72 rounded-full ambient-orb blur-3xl"
-            animate={shouldReduceMotion ? undefined : { x: [0, 60, 0], y: [0, -30, 0] }}
-            transition={shouldReduceMotion ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="pointer-events-none absolute right-[-8rem] top-[50rem] h-80 w-80 rounded-full ambient-orb blur-3xl"
-            animate={shouldReduceMotion ? undefined : { x: [0, -60, 0], y: [0, 40, 0] }}
-            transition={shouldReduceMotion ? undefined : { duration: 9, repeat: Infinity, ease: "easeInOut" }}
-          />
-          {/* Home Section */}
-          <section
-            ref={homeRef}
-            className="flex flex-col lg:flex-row padding gap-8 justify-between py-16 items-center min-h-screen"
-          >
+      <main>
+        <section ref={homeRef} className="section-shell pt-32 md:pt-40">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="order-1 lg:order-2 w-full lg:w-[50%] flex justify-center lg:justify-end px-0 lg:px-8"
+              initial={{ opacity: 0, y: 26 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              className="max-w-2xl"
             >
-              <motion.img
-                className="w-full lg:w-[80%] max-w-md"
-                src="/image.png"
-                alt="Kyaw Mg Mg Thu"
-                animate={shouldReduceMotion ? undefined : { y: [0, -10, 0] }}
-                transition={shouldReduceMotion
-                  ? undefined
-                  : {
-                      duration: 4,
-                      repeat: Infinity,
-                      repeatType: "mirror",
-                      ease: "easeInOut",
-                    }}
-              />
-            </motion.div>
-
-            {/* Text Second on Mobile */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="order-2 lg:order-1 w-full lg:w-[50%] leading-7 flex flex-col gap-4"
-            >
-              <span className="w-fit rounded-full bg-light-teal/10 text-light-teal px-4 py-1 text-sm">
-                Available for freelance projects
-              </span>
-              <h5 className="text-xl text-light-teal mt-1">Hello, I'm</h5>
-              <h1 className="text-3xl md:text-5xl font-extrabold font-display text-light-font">Kyaw Mg Mg Thu</h1>
-              <h2 className="text-2xl md:text-4xl gradient-text">
-                Freelancer | Full-stack Developer
-              </h2>
-              <p className="italic text-lg text-light-font/85 max-w-2xl">
-                I design and build fast, elegant web products with React/Next.js
-                and Laravel. I also use AI-assisted workflows to ship features
-                faster while keeping code quality, performance, and SEO strong.
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-light-font/10 bg-white/70 px-4 py-2 text-sm font-semibold text-light-font/75 shadow-sm theme-surface">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Full-stack developer for production business systems
+              </div>
+              <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight text-light-font md:text-5xl lg:text-6xl">
+                Build production-ready web systems, end-to-end.
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-light-font/70 md:text-xl">
+                From React interfaces to Laravel backends and AWS/Docker deployment,
+  I turn business workflows into reliable production-ready web systems.
               </p>
-              <div className="flex flex-wrap gap-3 mt-4">
-                <a href="mailto:mthu35997@gmail.com" className="btn w-fit animated-gradient-bg bg-[length:300%_300%]">
-                  Let's Work Together
-                </a>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="https://github.com/KyawMgMgThu"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-fit border border-light-teal text-light-teal px-4 py-3 rounded hover:bg-light-teal/10 transition"
+                  href="mailto:mthu35997@gmail.com"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-light-font px-6 py-3 text-sm font-bold text-light-bg transition hover:translate-y-[-1px] hover:shadow-lg"
                 >
-                  View GitHub
+                  Discuss Your Project <FaArrowRight className="text-xs" />
                 </a>
+                <button
+                  onClick={() => scrollToSection(projectsRef)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-light-font/15 px-6 py-3 text-sm font-bold text-light-font transition hover:border-light-teal hover:text-light-teal"
+                >
+                  View Case Studies
+                </button>
               </div>
-            </motion.div>
-          </section>
-
-          {/* About Section */}
-          <section ref={aboutRef} className="py-16 padding">
-            <div className="max-w-6xl mx-auto font-wo">
-              <motion.div
-                variants={sectionVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="relative text-center mb-16"
-              >
-                <h2 className="section-title">About & Skills</h2>
-                <p className="section-subtitle">Building reliable software with modern frontend and backend stacks.</p>
-                <motion.svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 200 20"
-                  className="absolute left-1/2 transform -translate-x-1/2 mt-2"
-                  width="200"
-                  height="40"
-                >
-                  <motion.path
-                    d="M0 10 Q 25 0, 50 10 T 100 10 T 150 10 T 200 10"
-                    className="stroke-light-teal"
-                    strokeWidth="3"
-                    fill="transparent"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    transition={{
-                      duration: 1.2,
-                      delay: 0.3,
-                      ease: "easeInOut",
-                    }}
-                  />
-                </motion.svg>
-              </motion.div>
-
-              <div className="flex flex-col lg:flex-row gap-12 items-start">
-                {/* Improved Image Design */}
-                <div className="w-full lg:w-[40%] flex justify-center relative group">
-                  <motion.div
-                    className="relative overflow-hidden rounded-lg shadow-xl w-full max-w-md"
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                    viewport={{ once: true }}
-                  >
-                    <img
-                      src="/me.jpg"
-                      alt="Kyaw Mg Mg Thu"
-                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                      <div className="text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <h3 className="text-lg font-bold">Kyaw Mg Mg Thu</h3>
-                        <p className="text-light-teal">Full-Stack Developer</p>
-                      </div>
-                    </div>
-                    <div className="absolute -inset-2 border-2 border-light-teal rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                  </motion.div>
-                </div>
-
-                <div className="w-full lg:w-[60%] flex flex-col gap-6">
-                  <motion.div
-                    className="mt-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    viewport={{ once: true }}
-                  >
-                    <h3 className="text-2xl font-bold text-light-teal mb-4">
-                      Education
-                    </h3>
-
-                    <div className="space-y-6">
-                      <div className="border-l-2 border-light-teal pl-4">
-                        <h4 className="text-lg font-semibold text-light-font">
-                          In Matriculation
-                        </h4>
-                        <p className="text-light-font/80">
-                          Matriculated in 2022 | Currently studying at the
-                          University of Computer Studies, Myeik. | 2022-Now
-                        </p>
-                      </div>
-
-                      <div className="border-l-2 border-light-teal pl-4">
-                        <h4 className="text-lg font-semibold text-light-font">
-                          Getting Started Web Developement
-                        </h4>
-                        <p className="text-light-font/80">
-                          Self-taught through YouTube and online courses
-                        </p>
-                        <ul className="list-disc pl-5 mt-2 text-light-font/80 space-y-1">
-                          <li>
-                            HTML, CSS, Bootstrap, JavaScript, JQuery, PHP,
-                            Laravel, Mysql at Code Lab | 2022
-                          </li>
-                          <li>
-                            Advanced PHP Framework Thinking, Git, GitHub, Linux at
-                            Creative Coder Myanmar | 2023
-                          </li>
-                          <li>
-                            Laravel Filament, Laravel Livewire, React.js,
-                            Next.js at Youtube Platform | 2023-2024
-                          </li>
-                          <li>Aws Cloub Ec2, Tailwind at Udemy Platform | 2024</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <motion.div
-                  className="overflow-x-hidden whitespace-nowrap py-2 px-1 relative"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  <motion.div
-                    className="inline-flex space-x-6"
-                    animate={{
-                      x: ["0%", "-100%"],
-                    }}
-                    transition={{
-                      x: {
-                        repeat: Infinity,
-                        repeatType: "loop",
-                        duration: 30,
-                        ease: "linear",
-                      },
-                    }}
-                  >
-                    {/* First set of logos */}
-                    {[
-                      "https://brandeps.com/logo-download/H/HTML-5-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/C/CSS-3-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/J/JavaScript-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/J/JQuery-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/P/PHP-logo-vector-01.svg",
-                      "https://brandeps.com/icon-download/L/Laravel-icon-vector-04.svg",
-                      "https://brandeps.com/logo-download/M/MySQL-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/G/Git-logo-vector-01.svg",
-                      "https://brandeps.com/icon-download/G/Github-icon-vector-22.svg",
-                      "https://brandeps.com/icon-download/R/React-icon-vector-01.svg",
-                      "https://brandeps.com/icon-download/N/Next-js-icon-vector-01.svg",
-                      "https://brandeps.com/icon-download/A/Amazon-aws-icon-vector-01.svg",
-                      "https://brandeps.com/logo-download/N/Node-JS-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/T/Typescript-logo-vector-01.svg",
-                    ].map((logo, index) => (
-                      <img
-                        key={`first-${index}`}
-                        src={logo}
-                        alt=""
-                        className="h-24 w-24 object-contain"
-                      />
-                    ))}
-
-                    {/* Second set (duplicate for seamless looping) */}
-                    {[
-                      "https://brandeps.com/logo-download/H/HTML-5-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/C/CSS-3-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/J/JavaScript-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/J/JQuery-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/P/PHP-logo-vector-01.svg",
-                      "https://brandeps.com/icon-download/L/Laravel-icon-vector-04.svg",
-                      "https://brandeps.com/logo-download/M/MySQL-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/G/Git-logo-vector-01.svg",
-                      "https://brandeps.com/icon-download/G/Github-icon-vector-22.svg",
-                      "https://brandeps.com/icon-download/R/React-icon-vector-01.svg",
-                      "https://brandeps.com/icon-download/N/Next-js-icon-vector-01.svg",
-                      "https://brandeps.com/icon-download/A/Amazon-aws-icon-vector-01.svg",
-                      "https://brandeps.com/logo-download/N/Node-JS-logo-vector-01.svg",
-                      "https://brandeps.com/logo-download/T/Typescript-logo-vector-01.svg",
-                    ].map((logo, index) => (
-                      <img
-                        key={`second-${index}`}
-                        src={logo}
-                        alt=""
-                        className="h-24 w-24 object-contain"
-                      />
-                    ))}
-                  </motion.div>
-                </motion.div>
-              </div>
-            </div>
-          </section>
-
-          {/* Projects Section */}
-          <section ref={projectsRef} className="py-16 padding  min-h-screen">
-            <div className="max-w-6xl mx-auto">
-              <motion.div
-                variants={sectionVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="relative text-center mb-16"
-              >
-                <h2 className="section-title">Featured Projects</h2>
-                <p className="section-subtitle">Selected products focused on performance, usability, and clean engineering.</p>
-                <motion.svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 200 20"
-                  className="absolute left-1/2 transform -translate-x-1/2 mt-2"
-                  width="300"
-                  height="40"
-                >
-                  <motion.path
-                    d="M0 10 Q 25 0, 50 10 T 100 10 T 150 10 T 200 10"
-                    className="stroke-light-teal"
-                    strokeWidth="3"
-                    fill="transparent"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    transition={{
-                      duration: 1.2,
-                      delay: 0.3,
-                      ease: "easeInOut",
-                    }}
-                  />
-                </motion.svg>
-              </motion.div>
-
-              <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-                {/* Project 1 */}
-                <motion.div
-                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -8, scale: 1.01 }}
-                >
-                  <div className="relative">
-                    <img
-                      src="logos/digital_menu.jpg"
-                      alt="QR Code Digital Menu System"
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <h3 className="text-lg font-semibold text-white">
-                        QR Code Digital Menu System
-                      </h3>
-                    </div>
+              <p className="mt-4 text-sm font-medium text-light-font/55">Usually replies within 24 hours.</p>
+              <div className="mt-10 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+                {stats.map((stat, index) => (
+                  <div key={`${stat.value}-${index}`} className="rounded-lg border border-light-font/10 bg-white/65 p-4 theme-surface">
+                    <p className="text-xl font-extrabold text-light-font">{stat.value}</p>
+                    <p className="mt-1 text-sm leading-5 text-light-font/60">{t(stat.label)}</p>
                   </div>
-
-                  <div className="p-6">
-                    <p className="text-light-font text-sm mb-4">
-                      A contactless restaurant menu solution allowing customers
-                      to view menus, ingredients, and promotions by scanning QR
-                      codes. Features real-time updates and analytics.
-                    </p>
-
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-light-font mb-2">
-                        Tech Stack:
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Laravel 10
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Filament
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Livewire
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          MySQL
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          AWS
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          EC2
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <a
-                        href="https://github.com/KyawMgMgThu/DIgital_menu"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-light-teal font-medium text-sm flex items-center gap-1 hover:underline"
-                      >
-                        <FaGithub className="text-base" />
-                        View Code
-                      </a>
-                      {/* <a
-        href="https://demo.digitalmenu.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-white bg-light-teal px-3 py-1.5 rounded text-sm font-medium hover:bg-light-teal/90 transition"
-      >
-        Live Demo
-      </a> */}
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Project 2 */}
-                <motion.div
-                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -8, scale: 1.01 }}
-                >
-                  <div className="relative">
-                    <img
-                      src="logos/portfolio.png"
-                      alt="Personal Portfolio"
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <h3 className="text-lg font-semibold text-white">
-                        Personal Portfolio
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <p className="text-light-font text-sm mb-4">
-                      A sleek and modern portfolio built to showcase my work,
-                      skills, and projects. Designed with performance and
-                      aesthetics in mind, this site uses motion animations and
-                      responsive layouts to create an interactive user
-                      experience.
-                    </p>
-
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-light-font mb-2">
-                        Tech Stack:
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          React 19
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          TypeScript
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Vite
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Tailwind CSS 4
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Framer Motion
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          FontAwesome
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          React Icons
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <a
-                        href="https://github.com/KyawMgMgThu/kyawmgmgthu-portfolio"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-light-teal font-medium text-sm flex items-center gap-1 hover:underline"
-                      >
-                        <FaGithub className="text-base" />
-                        View Code
-                      </a>
-                      {/* <a
-        href="https://yourportfolio.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-white bg-light-teal px-3 py-1.5 rounded text-sm font-medium hover:bg-light-teal/90 transition"
-      >
-        Live Demo
-      </a> */}
-                    </div>
-                  </div>
-                </motion.div>
-                
-
-                {/* Project 3 */}
-                <motion.div
-                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -8, scale: 1.01 }}
-                >
-                  <div className="relative">
-                    <img
-                      src="logos/kid-learning.png"
-                      alt="Kids Learning Website"
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <h3 className="text-lg font-semibold text-white">
-                        Kid's Learning Website
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <p className="text-light-font text-sm mb-4">
-                      An engaging educational platform designed for kids to
-                      learn through interactive activities, puzzles, drawing,
-                      speech tools, and fun animations. This web app helps
-                      children explore numbers, alphabets, colors, and more
-                      while keeping learning fun and intuitive.
-                    </p>
-
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-light-font mb-2">
-                        Tech Stack:
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          React
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Bootstrap
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          React-Speech
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          MUI
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Canvas
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          FontAwesome
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          React-Router-DOM
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <a
-                        href="https://github.com/KyawMgMgThu/KG_Learning_website"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-light-teal font-medium text-sm flex items-center gap-1 hover:underline"
-                      >
-                        <FaGithub className="text-base" />
-                        View Code
-                      </a>
-                      {/* <a
-        href="https://kidslearningdemo.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-white bg-light-teal px-3 py-1.5 rounded text-sm font-medium hover:bg-light-teal/90 transition"
-      >
-        Live Demo
-      </a> */}
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Project 4 */}
-                <motion.div
-                  className="glass-panel rounded-xl overflow-hidden transition-shadow duration-300"
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -8, scale: 1.01 }}
-                >
-                  <div className="relative">
-                    <img
-                      src="logos/pos.jpg"
-                      alt="Kyaw Gyi POS System"
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <h3 className="text-lg font-semibold text-white">
-                        Kyaw Gyi POS System
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <p className="text-light-font text-sm mb-4">
-                      A powerful and responsive Point of Sale (POS) system
-                      tailored for small to medium-sized businesses. Kyaw Gyi
-                      POS System offers inventory tracking, receipt printing,
-                      sales reporting, and PDF exports. Built with modern tools
-                      to deliver performance, usability, and scalability.
-                    </p>
-
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-light-font mb-2">
-                        Tech Stack:
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Laravel 10
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          React
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Vite
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Bootstrap 5
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          SweetAlert2
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          jsPDF
-                        </span>
-                        <span className="text-xs bg-light-teal/10 text-light-teal px-2 py-1 rounded">
-                          Axios
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <a
-                        href="https://github.com/KyawMgMgThu/pos_system"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-light-teal font-medium text-sm flex items-center gap-1 hover:underline"
-                      >
-                        <FaGithub className="text-base" />
-                        View Code
-                      </a>
-                      {/* <a
-        href="https://kyawgyiposdemo.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-white bg-light-teal px-3 py-1.5 rounded text-sm font-medium hover:bg-light-teal/90 transition"
-      >
-        Live Demo
-      </a> */}
-                    </div>
-                  </div>
-                </motion.div>
-
-
-                <div className="mt-8 text-center">
-  <a
-    href="https://github.com/KyawMgMgThu"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-flex items-center gap-2 text-white bg-light-teal hover:bg-light-teal-light px-4 py-2 rounded-xl text-sm font-medium transition-all"
-  >
-    <FaGithub className="text-base" />
-    View More Projects on GitHub
-  </a>
-</div>
-              </div>
-            </div>
-          </section>
-
-          {/* Services Section */}
-          <section
-            ref={servicesRef}
-            className="py-10 padding min-h-screen  text-white"
-          >
-            <div className="max-w-6xl mx-auto">
-              <motion.div
-                variants={sectionVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="relative text-center mb-16"
-              >
-                <h2 className="section-title">Services</h2>
-                <p className="section-subtitle">End-to-end product development from concept to production.</p>
-                <motion.svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 200 20"
-                  className="absolute left-1/2 transform -translate-x-1/2 mt-2"
-                  width="150"
-                  height="40"
-                >
-                  <motion.path
-                    d="M0 10 Q 25 0, 50 10 T 100 10 T 150 10 T 200 10"
-                    className="stroke-light-teal"
-                    strokeWidth="3"
-                    fill="transparent"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    transition={{
-                      duration: 1.2,
-                      delay: 0.3,
-                      ease: "easeInOut",
-                    }}
-                  />
-                </motion.svg>
-              </motion.div>
-
-              {/* Services Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {services.map((service, i) => (
-                  <motion.div
-                    key={service.id}
-                    custom={i}
-                    initial="hidden"
-                    whileInView="visible"
-                    variants={cardVariants}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -6, scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`glass-panel rounded-md p-8 transition-transform duration-300 cursor-pointer 
-                overflow-hidden text-light-font`}
-                  >
-                    <div className="flex justify-center mb-4 text-4xl">
-                      {service.icon}
-                    </div>
-                    <h2 className="text-lg font-semibold text-center uppercase tracking-wide mb-2.5">
-                      {service.title}
-                    </h2>
-                    <p className="text-sm font-light text-center">
-                      {service.contact}
-                    </p>
-                  </motion.div>
                 ))}
               </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.55, delay: 0.08, ease: "easeOut" }}
+              className="relative mx-auto w-full max-w-xl lg:max-w-none"
+            >
+              <div className="hero-visual relative min-h-[390px] overflow-hidden rounded-[1.75rem] border border-light-font/10 bg-white/75 p-4 shadow-2xl shadow-slate-950/10 theme-surface sm:min-h-[500px] md:p-6">
+                <div className="hero-grid absolute inset-0" />
+                <motion.div
+                  className="hero-aura absolute left-1/2 top-1/2 h-[62%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  animate={shouldReduceMotion ? undefined : { scale: [1, 1.06, 1], opacity: [0.65, 0.9, 0.65] }}
+                  transition={shouldReduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="hero-ring absolute left-1/2 top-1/2 h-[68%] w-[68%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  animate={shouldReduceMotion ? undefined : { rotate: 360 }}
+                  transition={shouldReduceMotion ? undefined : { duration: 28, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.img
+                  src="/hero-meditation.png"
+                  alt="Kyaw Mg Mg Thu meditating developer illustration"
+                  className="hero-figure absolute left-1/2 top-1/2 z-10 w-[78%] max-w-[34rem] -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_26px_50px_rgba(15,23,42,0.18)]"
+                  animate={shouldReduceMotion ? undefined : { y: [0, -14, 0] }}
+                  transition={shouldReduceMotion ? undefined : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                {heroVisualTags.map((tag) => (
+                  <div
+                    key={t(tag.label)}
+                    className="hero-orbit pointer-events-none absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 sm:block"
+                    style={
+                      {
+                        "--orbit-size": tag.orbitSize,
+                        "--orbit-duration": `${tag.duration}s`,
+                        "--orbit-delay": tag.delay,
+                      } as CSSProperties
+                    }
+                  >
+                    <div className="hero-orbit-rail" />
+                    <div className={`hero-orbit-spin ${shouldReduceMotion ? "" : "is-animated"}`}>
+                      <div className={`hero-orbit-badge-wrap ${shouldReduceMotion ? "" : "is-animated"}`}>
+                        <div className="hero-tech-tag inline-flex items-center gap-2 rounded-full border border-light-font/10 bg-light-bg/88 px-3 py-2 text-xs font-bold text-light-font shadow-lg shadow-slate-950/10 backdrop-blur-md">
+                          <span className="text-light-teal">{tag.icon}</span>
+                          {t(tag.label)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <motion.div
+                  className="absolute bottom-5 left-5 z-20 rounded-xl border border-light-font/10 bg-light-bg/86 p-4 text-light-font shadow-lg shadow-slate-950/10 backdrop-blur-md"
+                  animate={shouldReduceMotion ? undefined : { y: [0, 6, 0] }}
+                  transition={shouldReduceMotion ? undefined : { duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-light-teal">Available</p>
+                  <p className="mt-1 text-sm font-extrabold">Full product delivery</p>
+                  <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-light-font/55">
+                    <FaDatabase className="text-amber-500" />
+                    UI + API + DevOps
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        <section ref={aboutRef} className="section-shell border-t border-light-font/10">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              <p className="section-kicker">About</p>
+              <h2 className="section-title">Full-stack delivery with production responsibility.</h2>
+            </motion.div>
+            <motion.div
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <p className="text-xl leading-9 text-light-font/75">
+                I build and own complete web products across frontend, backend,
+                database, and infrastructure. My strongest work is production delivery:
+                translating business goals into reliable systems, shipping them
+                independently, and supporting practical operation after launch.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {["Independent ownership", "Production deployment", "Business workflow thinking"].map((item) => (
+                  <div key={item} className="rounded-lg border border-light-font/10 bg-white/70 p-4 theme-surface">
+                    <FaCode className="text-light-teal" />
+                    <p className="mt-3 text-sm font-bold text-light-font">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        <section ref={projectsRef} className="section-shell bg-white/45 theme-band">
+          <div className="mx-auto max-w-7xl">
+            <motion.div
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="max-w-3xl"
+            >
+              <p className="section-kicker">Featured Projects</p>
+              <h2 className="section-title">Real systems built independently from scratch.</h2>
+              <p className="section-subtitle">
+                Client-facing proof of end-to-end delivery: architecture, implementation,
+                deployment, and business workflow execution.
+              </p>
+            </motion.div>
+
+            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+              {projects.map((project, index) => (
+                <motion.article
+                  key={`${index}-${t(project.title)}`}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+                  className="overflow-hidden rounded-xl border border-light-font/10 bg-light-bg shadow-sm transition theme-surface"
+                >
+                  <div className="aspect-[16/9] bg-light-font p-5 text-light-bg">
+                    <div className="flex h-full flex-col justify-between rounded-lg border border-light-bg/12 bg-light-bg/5 p-5">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-light-bg/55">{t(project.domain)}</p>
+                        <p className="mt-3 max-w-sm text-2xl font-extrabold tracking-tight md:text-3xl">{t(project.title)}</p>
+                      </div>
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        {["Frontend", "Backend", "Deploy"].map((item) => (
+                          <div key={item} className="rounded-md border border-light-bg/12 bg-light-bg/8 px-3 py-2">
+                            <p className="text-xs font-semibold text-light-bg/70">{item}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6 md:p-8">
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">
+                        Built independently
+                      </span>
+                      <span className="rounded-full bg-light-teal/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-light-teal">
+                        Production system
+                      </span>
+                    </div>
+                    <h3 className="text-2xl font-extrabold tracking-tight text-light-font">{t(project.title)}</h3>
+                    <p className="mt-4 text-base leading-7 text-light-font/70">{t(project.description)}</p>
+
+                    <div className="mt-6">
+                      <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-light-font/45">Key Highlights</h4>
+                      <ul className="mt-3 space-y-3">
+                        {project.highlights.map((highlight, highlightIndex) => (
+                          <li key={highlightIndex} className="flex gap-3 text-sm leading-6 text-light-font/75">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-light-teal" />
+                            <span>{t(highlight)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {project.stack.map((item) => (
+                        <span key={item} className="rounded-md border border-light-font/10 px-3 py-1.5 text-xs font-semibold text-light-font/70">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
             </div>
-          </section>
 
-          {/* Contact Section */}
-          <section ref={contactRef} className="py-16 px-4 min-h-screen flex items-center justify-center bg-light-bg">
-      <div className="max-w-2xl mx-auto text-center">
-        {/* Heading with animated underline */}
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="relative mb-20"
-        >
-          <h2 className="section-title">Contact Me</h2>
+            <motion.div
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="mt-20 border-t border-light-font/10 pt-12"
+            >
+              <p className="section-kicker">Early Projects</p>
+              <h3 className="mt-3 max-w-3xl text-2xl font-extrabold tracking-tight text-light-font md:text-4xl">
+                Junior-stage experiments kept as growth proof.
+              </h3>
+              <p className="section-subtitle">
+                These are earlier practice projects. I keep them below the production
+                systems so clients see my current level first, while recruiters can
+                still see my learning path and technical range.
+              </p>
+            </motion.div>
 
-          <motion.svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 200 20"
-            className="absolute left-1/2 transform -translate-x-1/2 mt-2"
-            width="180"
-            height="40"
+            <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              {earlyProjects.map((project, index) => (
+                <motion.article
+                  key={t(project.title)}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+                  className="flex h-full flex-col overflow-hidden rounded-xl border border-light-font/10 bg-light-bg shadow-sm theme-surface"
+                >
+                  <div className="aspect-[16/10] overflow-hidden bg-light-font/5">
+                    <img src={project.image} alt={t(project.title)} className="h-full w-full object-cover transition duration-500 hover:scale-105" />
+                  </div>
+                  <div className="flex flex-1 flex-col p-5">
+                    <span className="mb-3 w-fit rounded-full bg-light-teal/10 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-light-teal">
+                      Junior Experiment
+                    </span>
+                    <h4 className="text-lg font-extrabold tracking-tight text-light-font">{t(project.title)}</h4>
+                    <p className="mt-3 text-sm leading-6 text-light-font/70">{t(project.description)}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {project.stack.map((item) => (
+                        <span key={item} className="rounded-md border border-light-font/10 px-2.5 py-1 text-[0.7rem] font-semibold text-light-font/65">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      href={project.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-light-teal hover:text-light-teal-light"
+                    >
+                      View Code <FaExternalLinkAlt className="text-xs" />
+                    </a>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section ref={stackRef} className="section-shell">
+          <div className="mx-auto max-w-7xl">
+            <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-3xl">
+              <p className="section-kicker">Tech Stack</p>
+              <h2 className="section-title">A practical stack for shipping complete products.</h2>
+            </motion.div>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {techStack.map((group, index) => (
+                <motion.div
+                  key={`${index}-${t(group.category)}`}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="rounded-xl border border-light-font/10 bg-white/70 p-6 theme-surface"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-light-teal/10 text-xl text-light-teal">
+                    {group.icon}
+                  </div>
+                  <h3 className="mt-5 text-lg font-extrabold text-light-font">{t(group.category)}</h3>
+                  <ul className="mt-4 space-y-2">
+                    {group.items.map((item, itemIndex) => (
+                      <li key={itemIndex} className="text-sm font-medium text-light-font/70">{t(item)}</li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section ref={servicesRef} className="section-shell border-y border-light-font/10 bg-white/45 theme-band">
+          <div className="mx-auto max-w-7xl">
+            <motion.div variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-3xl">
+              <p className="section-kicker">What I Can Do</p>
+              <h2 className="section-title">Client-focused development services.</h2>
+              <p className="section-subtitle">
+                Services focused on business outcomes: better workflows, reliable releases,
+                lower maintenance risk, and faster delivery from one accountable developer.
+              </p>
+            </motion.div>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
+              {services.map((service, index) => (
+                <motion.div
+                  key={`${index}-${t(service.title)}`}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="rounded-xl border border-light-font/10 bg-light-bg p-6 theme-surface"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-light-font text-light-bg">
+                      {service.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-extrabold text-light-font">{t(service.title)}</h3>
+                      <p className="mt-2 text-sm leading-6 text-light-font/70">{t(service.description)}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+        <section ref={contactRef} className="section-shell bg-light-font text-light-bg">
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mx-auto max-w-4xl text-center"
           >
-            <motion.path
-              d="M0 10 Q 25 0, 50 10 T 100 10 T 150 10 T 200 10"
-              className="stroke-light-teal"
-              strokeWidth="3"
-              fill="transparent"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              transition={{
-                duration: 1.2,
-                delay: 0.3,
-                ease: "easeInOut",
-              }}
-            />
-          </motion.svg>
-        </motion.div>
-
-        {/* Main Message */}
-
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="text-light-font/80 my-4 text-lg leading-8"
-        >
-          I turn ideas into production-ready web applications with clear timelines and clean execution. If you need a reliable developer for your next build, let’s discuss your project goals.
-        </motion.p>
-
-        <motion.a
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -2, scale: 1.04 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        viewport={{ once: true }}
-          href="mailto:mthu35997@gmail.com"
-          className="inline-block text-white px-6 py-2 rounded-md transition shadow-lg shadow-light-teal/20 animated-gradient-bg bg-[length:300%_300%]"
-        >
-          Start a Project
-        </motion.a>
-      </div>
-    </section>
-
-          {/* Footer */}
-          <footer className="py-8 px-6 lg:px-24 text-center">
-            <div className="flex justify-center gap-14 mb-4">
+            <p className="text-sm font-bold uppercase tracking-[0.26em] text-light-bg/55">Contact</p>
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight md:text-5xl">
+              Need one developer to own the full product delivery?
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-light-bg/70 md:text-lg">
+              Available for freelance and full-time opportunities. Share your product
+              goal, timeline, and current status, and I will respond with a clear
+              implementation plan and next step.
+            </p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <a
-                href="https://github.com/kyawmgmgthu"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="mailto:mthu35997@gmail.com"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-light-bg px-6 py-3 text-sm font-bold text-light-font transition hover:translate-y-[-1px]"
               >
-                <FaGithub className="fab fa-github text-2xl text-light-font hover:text-light-teal transition" />
+                Email Me <FaArrowRight className="text-xs" />
               </a>
               <a
-                href="tel://+959662988841"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="tel:+959662988841"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-light-bg/20 px-6 py-3 text-sm font-bold text-light-bg transition hover:bg-light-bg/10"
               >
-                <FaPhone className="fab fa- text-2xl text-light-font hover:text-light-teal transition" />
-              </a>
-              <a
-                href="https://www.facebook.com/profile.php?id=100057101206481&mibextid=ZbWKwL"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaFacebook className="fab fa- text-2xl text-light-font hover:text-light-teal transition" />
+                Call Directly
               </a>
             </div>
-            <p className="text-light-font text-lg flex justify-center items-center gap-2 flex-wrap">
-              Developed by
-              <FaHeart className="text-light-teal text-xl sm:text-lg" />
-              Kyaw Mg Mg Thu
-            </p>
-          </footer>
-        </main>
+          </motion.div>
+        </section>
+      </main>
 
-        <ChatBot isDark={isDark} />
-      </div>
-    </>
+      <footer className="border-t border-light-font/10 bg-light-bg px-5 py-8 text-center">
+        <div className="mb-4 flex justify-center gap-6">
+          <a href="https://github.com/kyawmgmgthu" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <FaGithub className="text-2xl text-light-font/70 transition hover:text-light-teal" />
+          </a>
+          <a href="tel:+959662988841" aria-label="Phone">
+            <FaPhone className="text-2xl text-light-font/70 transition hover:text-light-teal" />
+          </a>
+          <a
+            href="https://www.facebook.com/profile.php?id=100057101206481&mibextid=ZbWKwL"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+          >
+            <FaFacebook className="text-2xl text-light-font/70 transition hover:text-light-teal" />
+          </a>
+        </div>
+        <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-light-font/65">
+          Developed by <FaHeart className="text-light-teal" /> Kyaw Mg Mg Thu
+        </p>
+      </footer>
+
+      <ChatBot isDark={isDark} />
+    </div>
   );
 };
 

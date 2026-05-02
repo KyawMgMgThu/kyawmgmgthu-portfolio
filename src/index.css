@@ -1,23 +1,15 @@
-/* Import Tailwind & Font Awesome */
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
-@import "@fortawesome/fontawesome-free/css/all.min.css";
 
-/* ======= Theme Variables ======= */
 @theme {
-  --color-nav-bg: #FDFDFE;
-  --color-light-bg: #F8FAFC;
-  --color-light-font: #000000;
-  --color-light-teal: #3238e5;
-  --color-light-teal-light: #4f57ea;
-  --color-dark-nav-bg: #060607;
-  --color-dark-bg: #060607;
-  --color-dark-font: #FBFBFE;
-  --color-dark-minty-teal: #05CE91;
-  --color-dark-minty-teal-light: #57DCB4;
-
-  --font-woff: "Plus Jakarta Sans", sans-serif;
-  --font-display: "Playfair Display", serif;
+  --color-light-bg: #f8fafc;
+  --color-light-font: #0f172a;
+  --color-light-teal: #2563eb;
+  --color-light-teal-light: #0f766e;
+  --color-dark-bg: #05070d;
+  --color-dark-font: #eef2ff;
+  --font-woff: "Plus Jakarta Sans", "Noto Sans Myanmar", sans-serif;
+  --font-mm: "Noto Sans Myanmar", "Plus Jakarta Sans", sans-serif;
 }
 
 :root {
@@ -29,78 +21,193 @@ html {
 }
 
 body {
-  font-family: var(--font-woff);
+  margin: 0;
+  min-width: 320px;
   background: #f8fafc;
+  font-family: var(--font-woff);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .theme-dark {
-  --color-nav-bg: #090a0f;
   --color-light-bg: #05070d;
-  --color-light-font: #e8ecff;
-  --color-light-teal: #49f2ba;
-  --color-light-teal-light: #8cf8d5;
+  --color-light-font: #eef2ff;
+  --color-light-teal: #38bdf8;
+  --color-light-teal-light: #34d399;
   color-scheme: dark;
 }
 
-/* ======= Utilities Layer ======= */
 @layer utilities {
-  .link-btn {
-    @apply relative after:content-[''] after:absolute after:left-0 after:bottom-0 
-           after:h-[2px] after:w-0 after:bg-light-teal after:transition-all 
-           after:duration-300 hover:after:w-full;
-  }
-
-  .padding {
-    @apply xl:px-24 lg:px-16 md:px-10 px-5;
-  }
-
   .font-woff {
     font-family: var(--font-woff);
   }
 
-  .font-display {
-    font-family: var(--font-display);
+  .font-mm {
+    font-family: var(--font-mm);
   }
 
-  .gradient-text {
-    @apply bg-gradient-to-r from-light-teal to-light-teal-light bg-clip-text text-transparent;
+  .section-shell {
+    @apply px-5 py-20 md:px-10 md:py-24 lg:px-16;
   }
 
-  .glass-panel {
-    @apply bg-white/80 backdrop-blur-md border border-white/60 shadow-xl;
+  .section-kicker {
+    @apply text-sm font-extrabold uppercase tracking-[0.24em] text-light-teal;
   }
 
   .section-title {
-    @apply text-3xl md:text-4xl font-bold text-light-font;
-    font-family: var(--font-display);
+    @apply mt-3 max-w-3xl text-3xl font-extrabold tracking-tight text-light-font md:text-5xl;
   }
 
   .section-subtitle {
-    @apply text-light-font/70 text-base md:text-lg mt-3;
+    @apply mt-5 max-w-2xl text-base leading-7 text-light-font/70 md:text-lg;
+  }
+
+  .theme-surface {
+    background-color: rgb(255 255 255 / 0.7);
+  }
+
+  .theme-band {
+    background-color: rgb(255 255 255 / 0.45);
   }
 
   .animated-gradient-bg {
-    background: linear-gradient(-45deg, #2d7ef8, #3238e5, #6f4cff, #00c3ff);
-    background-size: 300% 300%;
-    animation: gradient-shift 12s ease infinite;
-  }
-
-  .ambient-orb {
-    background: radial-gradient(circle at center, color-mix(in oklab, var(--color-light-teal) 45%, transparent), transparent 70%);
-    animation: float-orb 10s ease-in-out infinite;
+    background: linear-gradient(135deg, #2563eb, #0f766e);
+    background-size: 180% 180%;
+    animation: gradient-shift 10s ease infinite;
   }
 }
 
-.theme-dark .glass-panel {
-  @apply bg-slate-900/55 border-slate-700/60 shadow-slate-950/40;
+.theme-dark .theme-surface {
+  background-color: rgb(15 23 42 / 0.74);
 }
 
-.theme-dark .animated-gradient-bg {
-  background: linear-gradient(-45deg, #0ea5e9, #06b6d4, #14b8a6, #22c55e);
-  background-size: 300% 300%;
+.theme-dark .theme-band {
+  background-color: rgb(15 23 42 / 0.32);
+}
+
+.hero-visual {
+  isolation: isolate;
+}
+
+.hero-grid {
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, rgb(15 23 42 / 0.13) 1px, transparent 1.2px),
+    linear-gradient(135deg, rgb(37 99 235 / 0.08), transparent 42%),
+    linear-gradient(315deg, rgb(245 158 11 / 0.1), transparent 36%);
+  background-position:
+    0 0,
+    center,
+    center;
+  background-size:
+    22px 22px,
+    auto,
+    auto;
+  mask-image: linear-gradient(180deg, transparent 0%, black 12%, black 88%, transparent 100%);
+  animation: hero-grid-drift 22s linear infinite;
+}
+
+.hero-aura {
+  z-index: 1;
+  background:
+    radial-gradient(circle at 38% 36%, rgb(56 189 248 / 0.24), transparent 36%),
+    radial-gradient(circle at 66% 72%, rgb(245 158 11 / 0.18), transparent 40%);
+  filter: blur(18px);
+}
+
+.hero-ring {
+  z-index: 2;
+  border: 1px solid rgb(37 99 235 / 0.18);
+  border-left-color: transparent;
+  border-bottom-color: rgb(245 158 11 / 0.28);
+}
+
+.hero-figure {
+  max-height: min(500px, 82%);
+}
+
+.hero-orbit {
+  width: var(--orbit-size);
+  aspect-ratio: 1;
+}
+
+.hero-orbit-rail {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgb(37 99 235 / 0.14);
+  border-radius: 9999px;
+}
+
+.hero-orbit-spin {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-orbit-spin.is-animated {
+  animation: hero-orbit var(--orbit-duration) linear infinite;
+  animation-delay: var(--orbit-delay);
+}
+
+.hero-orbit-badge-wrap {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+}
+
+.hero-orbit-badge-wrap.is-animated {
+  animation: hero-orbit-counter var(--orbit-duration) linear infinite;
+  animation-delay: var(--orbit-delay);
+}
+
+.hero-tech-tag {
+  min-height: 38px;
+  white-space: nowrap;
+}
+
+.portrait-card {
+  isolation: isolate;
+}
+
+.portrait-glow {
+  background:
+    radial-gradient(circle at 20% 20%, rgb(56 189 248 / 0.32), transparent 34%),
+    radial-gradient(circle at 80% 70%, rgb(52 211 153 / 0.28), transparent 36%);
+  filter: blur(10px);
+}
+
+.portrait-dots {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgb(255 255 255 / 0.36) 1px, transparent 1.4px);
+  background-size: 14px 14px;
+  mask-image: linear-gradient(135deg, transparent 0%, black 18%, black 56%, transparent 88%);
+  animation: dot-drift 18s linear infinite;
+}
+
+.portrait-halftone {
+  background-image: radial-gradient(circle, rgb(255 255 255 / 0.7) 1px, transparent 1.8px);
+  background-size: 8px 8px;
+}
+
+.portrait-scan {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: 0;
+  z-index: 3;
+  height: 28%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgb(56 189 248 / 0.28), transparent);
+  mix-blend-mode: screen;
 }
 
 @keyframes gradient-shift {
@@ -115,13 +222,45 @@ body {
   }
 }
 
-@keyframes float-orb {
-  0%,
-  100% {
-    transform: translateY(0px) scale(1);
+@keyframes dot-drift {
+  from {
+    background-position: 0 0;
   }
-  50% {
-    transform: translateY(-18px) scale(1.05);
+  to {
+    background-position: 56px 56px;
+  }
+}
+
+@keyframes hero-grid-drift {
+  from {
+    background-position:
+      0 0,
+      center,
+      center;
+  }
+  to {
+    background-position:
+      66px 44px,
+      center,
+      center;
+  }
+}
+
+@keyframes hero-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-orbit-counter {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(-360deg);
   }
 }
 
@@ -135,25 +274,7 @@ body {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-/* ======= Components Layer ======= */
-@layer components {
-  .btn {
-    @apply bg-light-teal text-white font-light text-xl py-3 px-4 rounded;
-  }
-
-  .btn:hover {
-    @apply bg-light-teal-light;
-  }
-
-  .btn-dark {
-    @apply bg-dark-minty-teal text-white font-light text-xl py-3 px-4 rounded;
-  }
-
-  .btn-dark:hover {
-    @apply bg-dark-minty-teal-light;
   }
 }

@@ -1,340 +1,318 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaRobot, FaTimes, FaPaperPlane, FaCode, FaLaravel, FaDatabase } from "react-icons/fa";
+import { FaDatabase, FaLaravel, FaPaperPlane, FaReact, FaRobot, FaTimes } from "react-icons/fa";
 
-const projectCards = [
+type Language = "en" | "my";
+type ProjectCard = { title: string; description: string; tech: string[]; level: string };
+type ExperienceCard = { icon: ReactNode; title: string; description: string };
+type CardItem = ProjectCard | ExperienceCard;
+type CardData = CardItem[];
+type BotResponse = { response: string | string[]; isCard?: boolean; cardData?: CardData };
+
+const getProjectCards = (language: Language) => [
+  {
+    title: "Hospital Information Management System (HIMS)",
+    description: language === "en"
+      ? "A production hospital operations platform covering registration, appointments, triage, consultation, pharmacy, billing, and multi-hospital management."
+      : "registration, appointments, triage, consultation, pharmacy, billing နဲ့ multi-hospital management ကို စီမံနိုင်တဲ့ production hospital operations platform ဖြစ်ပါတယ်။",
+    tech: ["Laravel", "PHP", "Blade", "Bootstrap", "MySQL", "Vite"],
+    level: language === "en" ? "Production System" : "Production System",
+  },
+  {
+    title: "Qwerty Ticket System",
+    description: language === "en"
+      ? "A service desk platform for tickets, projects, public request forms, chat, settings, and role-based workflows."
+      : "tickets, projects, public request forms, chat, settings နဲ့ role-based workflows ပါဝင်တဲ့ service desk platform ဖြစ်ပါတယ်။",
+    tech: ["Laravel", "PHP", "Blade", "Tailwind CSS", "SQLite", "PHPUnit"],
+    level: language === "en" ? "Production System" : "Production System",
+  },
   {
     title: "QR Code Digital Menu System",
-    description:
-      "A contactless restaurant menu solution allowing customers to view menus, ingredients, and promotions by scanning QR codes. Features real-time updates and analytics.",
-    tech: ["Laravel 10", "Filament", "Livewire", "MySQL", "AWS", "EC2"],
-    link: "https://github.com/KyawMgMgThu/DIgital_menu"
+    description: language === "en"
+      ? "A junior-stage restaurant menu experiment for QR browsing and menu management practice."
+      : "QR browsing နဲ့ menu management practice အတွက် junior-stage restaurant menu experiment ဖြစ်ပါတယ်။",
+    tech: ["Laravel", "Filament", "Livewire", "MySQL"],
+    level: language === "en" ? "Junior Experiment" : "Junior Experiment",
   },
-  {
-    title: "Personal Portfolio",
-    description:
-      "A sleek and modern portfolio built to showcase my work, skills, and projects. Designed with performance and aesthetics in mind using animations and responsive layouts.",
-    tech: [
-      "React 19",
-      "TypeScript",
-      "Vite",
-      "Tailwind CSS 4",
-      "Framer Motion",
-      "FontAwesome",
-      "React Icons"
-    ],
-    link: "https://github.com/KyawMgMgThu/kyawmgmgthu-portfolio"
-  },
-  {
-    title: "Kid's Learning Website",
-    description:
-      "An interactive educational platform for kids featuring games, drawing, speech tools, and animations. Helps children learn numbers, alphabets, colors, and more.",
-    tech: [
-      "React",
-      "Bootstrap",
-      "React-Speech",
-      "MUI",
-      "Canvas",
-      "FontAwesome",
-      "React-Router-DOM"
-    ],
-    link: "https://github.com/KyawMgMgThu/KG_Learning_website"
-  },
-  {
-    title: "Kyaw Gyi POS System",
-    description:
-      "A modern POS system for small businesses featuring inventory management, receipt printing, sales reports, and PDF export. Built for performance and scalability.",
-    tech: [
-      "Laravel 10",
-      "React",
-      "Vite",
-      "Bootstrap 5",
-      "SweetAlert2",
-      "jsPDF",
-      "Axios"
-    ],
-    link: "https://github.com/KyawMgMgThu/pos_system"
-  }
 ];
 
-const experienceCards = [
+const getExperienceCards = (language: Language) => [
   {
-    icon: <FaCode className="text-2xl" />,
-    title: "Frontend Development",
-    description: "Building responsive UIs with React, Next.js, Bootstrap and tailwind"
+    icon: <FaReact className="text-2xl" />,
+    title: language === "en" ? "Frontend" : "Frontend",
+    description: language === "en" ? "React and Tailwind interfaces focused on clean responsive UX." : "clean responsive UX အတွက် React နဲ့ Tailwind interfaces များကို တည်ဆောက်ပေးနိုင်ပါတယ်။",
   },
   {
     icon: <FaLaravel className="text-2xl" />,
-    title: "Backend Development",
-    description: "Creating robust APIs with PHP/Laravel"
+    title: language === "en" ? "Backend" : "Backend",
+    description: language === "en" ? "Laravel systems, APIs, authentication, admin flows, and business logic." : "Laravel systems, APIs, authentication, admin flows နဲ့ business logic များကို တည်ဆောက်ပေးနိုင်ပါတယ်။",
   },
   {
     icon: <FaDatabase className="text-2xl" />,
-    title: "Database Design",
-    description: "Structuring efficient data models with MySQL"
-  }
+    title: language === "en" ? "Production Delivery" : "Production Delivery",
+    description: language === "en" ? "Database structure, AWS, Docker, hosting, and launch support." : "database structure, AWS, Docker, hosting နဲ့ launch support အထိ လုပ်ပေးနိုင်ပါတယ်။",
+  },
 ];
 
-// Now the knowledgeBase can use those variables
-const knowledgeBase: Record<string, { response: string | string[], isCard?: boolean, cardData?: typeof projectCards | typeof experienceCards }> = {
-  "hello": {
-    response: "Hello! I'm Kyaw's portfolio assistant. I can quickly show his skills, featured projects, education, and contact details."
-  },
-  "hi": {
-    response: "Hi there! Ask me about Kyaw's full-stack stack, real-world projects, or how to work with him."
-  },
-  "skill": {
-    response: [
-      "Kyaw specializes in:",
-      "• Frontend: React.js, Next.js, JavaScript, TypeScript, Tailwind, Bootstrap",
-      "• Backend: PHP, Laravel",
-      "• Databases: MySQL, MongoDB",
-      "• DevOps: AWS, Git, GitHub",
-      "• Other: Responsive Design, Clean Code Architecture"
-    ]
-  },
-  "project": {
-    response: "Featured projects include:",
-    isCard: true,
-    cardData: projectCards
-  },
-  "experience": {
-    response: "Kyaw has practical experience with:",
-    isCard: true,
-    cardData: experienceCards
-  },
-  "education": {
-    response: [
-      "• Currently studying at University of Computer Studies, Myeik (2022-Present)",
-      "• HTML, CSS, Bootstrap, JavaScript, JQuery, PHP, Laravel, Mysql at Code Lab | 2022",
-      "• Advanced PHP Framework Thinking, Git, GitHub at Creative Coder Myanmar | 2023",
-      "• Laravel Filament, Laravel Livewire, React.js, Next.js at Youtube Platform | 2023-2024",
-      "• Aws Cloub Ec2 at Udemy Platform | 2024",
-      "• Specialized in web development technologies"
-    ]
-  },
-  "contact": {
-    response: [
-      "You can reach Kyaw through:",
-      "• Email: mthu35997@gmail.com",
-      "• Phone: +959662988841",
-      "• GitHub: github.com/kyawmgmgthu",
-      "• Facebook: facebook.com/profile.php?id=100057101206481"
-    ]
-  },
-  "default": {
-    response: "I'm not sure I understand. Try asking about Kyaw's: skills, projects, education, or contact information."
-  }
+const getKnowledgeBase = (language: Language): Record<string, BotResponse> => {
+  const projectCards = getProjectCards(language);
+  const experienceCards = getExperienceCards(language);
+
+  return {
+    hello: {
+      response: language === "en"
+        ? "Hello. I can summarize Kyaw's services, real production projects, tech stack, or contact details."
+        : "မင်္ဂလာပါ။ Kyaw ရဲ့ services, production projects, tech stack နဲ့ contact details တွေကို အကျဉ်းချုပ်ပြောပြနိုင်ပါတယ်။",
+    },
+    skill: {
+      response: language === "en"
+        ? [
+            "Kyaw's core stack:",
+            "Frontend: React, Tailwind CSS, TypeScript, responsive UI",
+            "Backend: PHP, Laravel, REST APIs, MySQL",
+            "DevOps: AWS, Docker, Kubernetes, CI/CD",
+            "Tools: Git, GitHub, Vite, NPM",
+          ]
+        : [
+            "Kyaw ရဲ့ အဓိက tech stack:",
+            "Frontend: React, Tailwind CSS, TypeScript, responsive UI",
+            "Backend: PHP, Laravel, REST APIs, MySQL",
+            "DevOps: AWS, Docker, Kubernetes, CI/CD",
+            "Tools: Git, GitHub, Vite, NPM",
+          ],
+    },
+    project: {
+      response: language === "en"
+        ? "Projects include current production systems first, then selected early experiments:"
+        : "လက်ရှိ production systems များကို အရင်ပြသပြီး selected early experiments များကိုနောက်တွင် ဖော်ပြထားပါတယ်။",
+      isCard: true,
+      cardData: projectCards,
+    },
+    service: {
+      response: language === "en"
+        ? [
+            "What Kyaw can do:",
+            "Build complete business web systems",
+            "Modernize existing websites into clean responsive interfaces",
+            "Develop Laravel backends, APIs, dashboards, and admin workflows",
+            "Deploy projects with AWS, Docker, Kubernetes, and hosting",
+          ]
+        : [
+            "Kyaw လုပ်ပေးနိုင်တာ:",
+            "complete business web systems တည်ဆောက်ခြင်း",
+            "ရှိပြီးသား websites များကို clean responsive interfaces အဖြစ်ပြန်လည်တည်ဆောက်ခြင်း",
+            "Laravel backends, APIs, dashboards, admin workflows တည်ဆောက်ခြင်း",
+            "AWS, Docker, Kubernetes, hosting တို့ဖြင့် deployment လုပ်ခြင်း",
+          ],
+    },
+    experience: {
+      response: language === "en" ? "Practical experience areas:" : "အတွေ့အကြုံရှိသော အဓိကပိုင်းများ:",
+      isCard: true,
+      cardData: experienceCards,
+    },
+    contact: {
+      response: language === "en"
+        ? ["Contact Kyaw:", "Email: mthu35997@gmail.com", "Phone: +959662988841", "GitHub: github.com/kyawmgmgthu"]
+        : ["Kyaw ကို ဆက်သွယ်ရန်:", "Email: mthu35997@gmail.com", "Phone: +959662988841", "GitHub: github.com/kyawmgmgthu"],
+    },
+    default: {
+      response: language === "en"
+        ? "Ask me about projects, services, tech stack, experience, or how to contact Kyaw."
+        : "projects, services, tech stack, experience သို့မဟုတ် Kyaw ကို ဘယ်လိုဆက်သွယ်ရမလဲ ဆိုတာ မေးနိုင်ပါတယ်။",
+    },
+  };
 };
 
 type SmartChatBotProps = {
   isDark?: boolean;
+  language?: Language;
 };
 
-const SmartChatBot = ({ isDark = false }: SmartChatBotProps) => {
+const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Array<{ text: string; sender: "user" | "bot"; isCard?: boolean; cardData?: typeof projectCards | typeof experienceCards }>>([]);
-  const [inputValue, setInputValue] = useState('');
+  const [messages, setMessages] = useState<
+    Array<{ text: string; sender: "user" | "bot"; isCard?: boolean; cardData?: CardData }>
+  >([]);
+  const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const knowledgeBase = getKnowledgeBase(language);
 
   const getBotResponse = (userInput: string) => {
     const input = userInput.toLowerCase();
-    if (input.includes("project") || input.includes("work")) return knowledgeBase["project"];
-    if (input.includes("skill") || input.includes("technology")) return knowledgeBase["skill"];
-    if (input.includes("education") || input.includes("study") || input.includes("school")) return knowledgeBase["education"];
-    if (input.includes("contact") || input.includes("email") || input.includes("phone")) return knowledgeBase["contact"];
-    if (input.includes("experience") || input.includes("background")) return knowledgeBase["experience"];
-    if (input.includes("hello") || input.includes("hi")) return knowledgeBase["hello"];
-    return knowledgeBase["default"];
+    if (input.includes("project") || input.includes("work")) return knowledgeBase.project;
+    if (input.includes("skill") || input.includes("technology") || input.includes("stack")) return knowledgeBase.skill;
+    if (input.includes("service") || input.includes("offer") || input.includes("do")) return knowledgeBase.service;
+    if (input.includes("contact") || input.includes("email") || input.includes("phone")) return knowledgeBase.contact;
+    if (input.includes("experience") || input.includes("background")) return knowledgeBase.experience;
+    if (input.includes("hello") || input.includes("hi")) return knowledgeBase.hello;
+    return knowledgeBase.default;
   };
 
   const handleSendMessage = () => {
-    if (inputValue.trim() === '') return;
+    if (inputValue.trim() === "") return;
 
-    const userMessage = { text: inputValue, sender: 'user' as const };
-    setMessages(prev => [...prev, userMessage]);
+    const userMessage = { text: inputValue, sender: "user" as const };
+    setMessages((prev) => [...prev, userMessage]);
     const currentInput = inputValue;
-    setInputValue('');
+    setInputValue("");
     setIsTyping(true);
 
     setTimeout(() => {
       const botResponse = getBotResponse(currentInput);
 
       if (botResponse.isCard && botResponse.cardData) {
-        setMessages(prev => [
+        setMessages((prev) => [
           ...prev,
-          { text: botResponse.response as string, sender: 'bot' },
-          {
-            text: "",
-            sender: 'bot',
-            isCard: true,
-            cardData: botResponse.cardData
-          }
+          { text: botResponse.response as string, sender: "bot" },
+          { text: "", sender: "bot", isCard: true, cardData: botResponse.cardData },
         ]);
+      } else if (Array.isArray(botResponse.response)) {
+        const botMessages = botResponse.response.map((text) => ({
+          text,
+          sender: "bot" as const,
+        }));
+        setMessages((prev) => [...prev, ...botMessages]);
       } else {
-        if (Array.isArray(botResponse.response)) {
-          const botMessages = botResponse.response.map(text => ({
-            text,
-            sender: 'bot' as const
-          }));
-          setMessages(prev => [...prev, ...botMessages]);
-        } else {
-          setMessages(prev => [...prev, { text: botResponse.response as string, sender: 'bot' }]);
-        }
+        setMessages((prev) => [...prev, { text: botResponse.response, sender: "bot" }]);
       }
+
       setIsTyping(false);
-    }, 800);
+    }, 500);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSendMessage();
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Enter") handleSendMessage();
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-5 right-5 z-50">
       <AnimatePresence mode="wait">
         {isOpen ? (
           <motion.div
-            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            initial={{ scale: 0.92, opacity: 0, y: 18 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ duration: 0.2 }}
-            className={`shadow-xl rounded-t-lg rounded-bl-lg w-80 h-96 flex flex-col border ${
-              isDark ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"
+            exit={{ scale: 0.96, opacity: 0, y: 18 }}
+            transition={{ duration: 0.18 }}
+            className={`flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-xl border shadow-2xl ${
+              isDark ? "border-slate-700 bg-slate-900" : "border-slate-200 bg-white"
             }`}
           >
-          
-          {/* Header */}
-          <div className="animated-gradient-bg text-white p-3 rounded-t-lg flex justify-between items-center">
-            <div className="flex items-center">
-              <FaRobot className="mr-2" />
-              <h3 className="font-semibold">Portfolio Assistant</h3>
-            </div>
-            <button onClick={() => setIsOpen(false)} className="text-white hover:text-gray-200">
-              <FaTimes />
-            </button>
-          </div>
-
-          {/* Messages */}
-          <div className={`flex-1 p-4 overflow-y-auto ${isDark ? "bg-slate-950/70" : "bg-gray-50"}`}>
-            {messages.length === 0 ? (
-              <div className={`text-center h-full flex flex-col justify-center ${isDark ? "text-slate-300" : "text-gray-500"}`}>
-                <p className="font-medium mb-2">Try asking:</p>
-                <p className="text-sm">• What services do you offer?</p>
-                <p className="text-sm">• Show me your best projects</p>
-                <p className="text-sm">• What is your tech stack?</p>
-                <p className="text-sm">• How can I contact you?</p>
+            <div className="flex items-center justify-between bg-light-font p-4 text-light-bg">
+              <div className="flex items-center gap-2">
+                <FaRobot />
+                <h3 className="font-bold">{language === "en" ? "Portfolio Assistant" : "Portfolio Assistant"}</h3>
               </div>
-            ) : (
-              messages.map((message, index) => (
-                <motion.div key={index} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-                  {message.isCard ? (
-                    <div className="mb-3">
-                      {message.cardData === projectCards ? (
-                        <div className="space-y-3">
-                          {projectCards.map((project, i) => (
-                            <div key={i} className={`border rounded-lg p-3 shadow-sm ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
-                              <h4 className="font-semibold text-light-teal">{project.title}</h4>
-                              <p className={`text-sm mt-1 ${isDark ? "text-slate-300" : "text-gray-600"}`}>{project.description}</p>
-                              <div className="mt-2 flex flex-wrap gap-1">
-                                {project.tech.map((t, j) => (
-                                  <span key={j} className={`text-xs px-2 py-1 rounded ${isDark ? "bg-slate-800 text-slate-200" : "bg-gray-100 text-gray-700"}`}>
-                                    {t}
+              <button onClick={() => setIsOpen(false)} className="text-light-bg/80 hover:text-light-bg" aria-label={language === "en" ? "Close chat" : "chat ပိတ်ရန်"}>
+                <FaTimes />
+              </button>
+            </div>
+
+            <div className={`flex-1 overflow-y-auto p-4 ${isDark ? "bg-slate-950/60" : "bg-slate-50"}`}>
+              {messages.length === 0 ? (
+                <div className={`flex h-full flex-col justify-center text-center ${isDark ? "text-slate-300" : "text-slate-500"}`}>
+                  <p className="mb-3 text-sm font-bold">{language === "en" ? "Try asking:" : "ဒီလိုမေးကြည့်ပါ:"}</p>
+                  <p className="text-sm">{language === "en" ? "What real projects has he built?" : "ဘယ်လို real projects တွေတည်ဆောက်ထားသလဲ?"}</p>
+                  <p className="text-sm">{language === "en" ? "What services do you offer?" : "ဘယ်လို services တွေပေးနိုင်သလဲ?"}</p>
+                  <p className="text-sm">{language === "en" ? "What is the tech stack?" : "tech stack ကဘာတွေလဲ?"}</p>
+                  <p className="text-sm">{language === "en" ? "How can I contact him?" : "ဘယ်လိုဆက်သွယ်နိုင်သလဲ?"}</p>
+                </div>
+              ) : (
+                messages.map((message, index) => (
+                  <motion.div key={index} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.18 }}>
+                    {message.isCard ? (
+                      <div className="mb-3 space-y-3">
+                        {(message.cardData || []).map((card, i) => (
+                          <div key={i} className={`rounded-lg border p-3 ${isDark ? "border-slate-700 bg-slate-900" : "border-slate-200 bg-white"}`}>
+                            <div className="flex items-start gap-3">
+                              {"icon" in card ? <div className="text-light-teal">{card.icon}</div> : null}
+                              <div>
+                                <h4 className={`font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{card.title}</h4>
+                                {"level" in card ? (
+                                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-light-teal">{card.level}</p>
+                                ) : null}
+                                <p className={`mt-1 text-sm leading-5 ${isDark ? "text-slate-300" : "text-slate-600"}`}>{card.description}</p>
+                              </div>
+                            </div>
+                            {"tech" in card ? (
+                              <div className="mt-3 flex flex-wrap gap-1.5">
+                                {card.tech.map((tech) => (
+                                  <span key={tech} className={`rounded px-2 py-1 text-xs font-semibold ${isDark ? "bg-slate-800 text-slate-200" : "bg-slate-100 text-slate-700"}`}>
+                                    {tech}
                                   </span>
                                 ))}
                               </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 gap-3">
-                          {experienceCards.map((exp, i) => (
-                            <div key={i} className={`border rounded-lg p-3 shadow-sm ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
-                              <div className="flex items-center gap-3">
-                                <div className="text-teal-500">{exp.icon}</div>
-                                <div>
-                                  <h4 className={`font-semibold ${isDark ? "text-slate-100" : "text-gray-900"}`}>{exp.title}</h4>
-                                  <p className={`text-sm ${isDark ? "text-slate-300" : "text-gray-600"}`}>{exp.description}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={`mb-3 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div
-                        className={`max-w-xs p-3 rounded-lg ${message.sender === 'user'
-                          ? 'animated-gradient-bg text-white rounded-br-none'
-                          : `${isDark ? "bg-slate-800 text-slate-100" : "bg-gray-200 text-gray-800"} rounded-bl-none`}`}
-                      >
-                        {message.text}
+                            ) : null}
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  )}
-                </motion.div>
-              ))
-            )}
-            {isTyping && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mb-3 flex justify-start"
-              >
-                <div className={`${isDark ? "bg-slate-800 text-slate-200" : "bg-gray-200 text-gray-700"} rounded-lg rounded-bl-none px-3 py-2 text-sm`}>
-                  <motion.span
-                    animate={{ opacity: [0.2, 1, 0.2] }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  >
-                    Typing...
-                  </motion.span>
-                </div>
-              </motion.div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+                    ) : (
+                      <div className={`mb-3 flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+                        <div
+                          className={`max-w-[85%] rounded-lg p-3 text-sm leading-5 ${
+                            message.sender === "user"
+                              ? "rounded-br-none bg-light-teal text-white"
+                              : `${isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-800"} rounded-bl-none border border-slate-200/80`
+                          }`}
+                        >
+                          {message.text}
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                ))
+              )}
 
-          {/* Input */}
-          <div className={`p-3 border-t ${isDark ? "border-slate-700 bg-slate-900" : "border-gray-200 bg-white"}`}>
-            <div className="flex">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask about the portfolio..."
-                className={`flex-1 border rounded-l-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-teal-500 text-sm ${
-                  isDark
-                    ? "bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-400"
-                    : "border-gray-300 text-gray-900"
-                }`}
-              />
-              <button
-                onClick={handleSendMessage}
-                className="animated-gradient-bg text-white px-4 py-2 rounded-r-lg hover:opacity-90 transition"
-              >
-                <FaPaperPlane />
-              </button>
+              {isTyping && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3 flex justify-start">
+                  <div className={`${isDark ? "bg-slate-800 text-slate-200" : "bg-white text-slate-700"} rounded-lg rounded-bl-none border border-slate-200/80 px-3 py-2 text-sm`}>
+                    {language === "en" ? "Typing..." : "ရိုက်နေသည်..."}
+                  </div>
+                </motion.div>
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          </div>
+
+            <div className={`border-t p-3 ${isDark ? "border-slate-700 bg-slate-900" : "border-slate-200 bg-white"}`}>
+              <div className="flex">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={language === "en" ? "Ask about the portfolio..." : "portfolio အကြောင်းမေးပါ..."}
+                  className={`min-w-0 flex-1 rounded-l-lg border px-3 py-2 text-sm outline-none focus:border-light-teal ${
+                    isDark
+                      ? "border-slate-700 bg-slate-800 text-slate-100 placeholder:text-slate-400"
+                      : "border-slate-300 bg-white text-slate-900"
+                  }`}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="flex items-center justify-center rounded-r-lg bg-light-font px-4 py-2 text-light-bg transition hover:bg-light-teal"
+                  aria-label={language === "en" ? "Send message" : "စာပို့ရန်"}
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
+            </div>
           </motion.div>
         ) : (
           <motion.button
             key="chat-open-button"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => setIsOpen(true)}
-            className="animated-gradient-bg text-white p-4 rounded-full shadow-lg hover:shadow-xl transition"
-            aria-label="Open chat"
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-light-font text-light-bg shadow-xl transition hover:bg-light-teal"
+            aria-label={language === "en" ? "Open chat" : "chat ဖွင့်ရန်"}
           >
             <FaRobot className="text-2xl" />
           </motion.button>
