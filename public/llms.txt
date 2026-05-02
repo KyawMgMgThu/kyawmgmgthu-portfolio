@@ -1,12 +1,18 @@
 # Kyaw Mg Mg Thu Portfolio
 
-This site presents Kyaw Mg Mg Thu's full-stack development portfolio.
+This site presents Kyaw Mg Mg Thu's full-stack development portfolio for clients, recruiters, and development teams.
 
 ## Focus Areas
-- React, Next.js, TypeScript frontend engineering
-- Laravel and PHP backend development
-- Performance-first, SEO-friendly website delivery
-- AI-assisted development workflows
+- Full-stack business web systems
+- React, TypeScript, and responsive frontend development
+- Laravel, PHP, MySQL, APIs, and admin workflows
+- AWS, Docker, hosting, deployment, and maintenance support
+
+## Current Experience
+- Independent full-stack developer for production-ready business web systems
+- 2 production systems shipped independently
+- 3+ other production workflows delivered
+- 4+ software products maintained after launch
 
 ## Primary Pages
 - / (home, skills, services, projects, contact)

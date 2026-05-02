@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { KeyboardEvent, ReactNode } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaDatabase, FaLaravel, FaPaperPlane, FaReact, FaRobot, FaTimes } from "react-icons/fa";
 
@@ -14,44 +14,50 @@ const getProjectCards = (language: Language) => [
   {
     title: "Hospital Information Management System (HIMS)",
     description: language === "en"
-      ? "A production hospital operations platform covering registration, appointments, triage, consultation, pharmacy, billing, and multi-hospital management."
-      : "registration, appointments, triage, consultation, pharmacy, billing နဲ့ multi-hospital management ကို စီမံနိုင်တဲ့ production hospital operations platform ဖြစ်ပါတယ်။",
+      ? "A production hospital operations platform for registration, appointments, triage, consultation, pharmacy, billing, rooms, and multi-hospital workflows."
+      : "registration, appointments, triage, consultation, pharmacy, billing, rooms နဲ့ multi-hospital workflows များကို စီမံနိုင်တဲ့ production hospital operations platform ဖြစ်ပါတယ်။",
     tech: ["Laravel", "PHP", "Blade", "Bootstrap", "MySQL", "Vite"],
     level: language === "en" ? "Production System" : "Production System",
   },
   {
-    title: "Qwerty Ticket System",
+    title: "Service Desk Ticket System",
     description: language === "en"
-      ? "A service desk platform for tickets, projects, public request forms, chat, settings, and role-based workflows."
-      : "tickets, projects, public request forms, chat, settings နဲ့ role-based workflows ပါဝင်တဲ့ service desk platform ဖြစ်ပါတယ်။",
+      ? "A service desk platform for support tickets, projects, public request forms, chat, approval, settings, and role-based workflows."
+      : "support tickets, projects, public request forms, chat, approval, settings နဲ့ role-based workflows ပါဝင်တဲ့ service desk platform ဖြစ်ပါတယ်။",
     tech: ["Laravel", "PHP", "Blade", "Tailwind CSS", "SQLite", "PHPUnit"],
     level: language === "en" ? "Production System" : "Production System",
   },
   {
     title: "QR Code Digital Menu System",
     description: language === "en"
-      ? "A junior-stage restaurant menu experiment for QR browsing and menu management practice."
-      : "QR browsing နဲ့ menu management practice အတွက် junior-stage restaurant menu experiment ဖြစ်ပါတယ်။",
+      ? "A practice restaurant menu project for QR browsing and menu management workflows."
+      : "QR browsing နဲ့ menu management workflow ကို လေ့ကျင့်ထားတဲ့ restaurant menu project ဖြစ်ပါတယ်။",
     tech: ["Laravel", "Filament", "Livewire", "MySQL"],
-    level: language === "en" ? "Junior Experiment" : "Junior Experiment",
+    level: language === "en" ? "Practice Project" : "Practice Project",
   },
 ];
 
 const getExperienceCards = (language: Language) => [
   {
-    icon: <FaReact className="text-2xl" />,
-    title: language === "en" ? "Frontend" : "Frontend",
-    description: language === "en" ? "React and Tailwind interfaces focused on clean responsive UX." : "clean responsive UX အတွက် React နဲ့ Tailwind interfaces များကို တည်ဆောက်ပေးနိုင်ပါတယ်။",
+    icon: <FaReact className="text-xl" />,
+    title: language === "en" ? "Independent Delivery" : "Independent Delivery",
+    description: language === "en"
+      ? "Builds full-stack web products independently across frontend, backend, database, and deployment."
+      : "Frontend, backend, database နဲ့ deployment အထိ full-stack web products များကို ကိုယ်တိုင်တည်ဆောက်ပါတယ်။",
   },
   {
-    icon: <FaLaravel className="text-2xl" />,
-    title: language === "en" ? "Backend" : "Backend",
-    description: language === "en" ? "Laravel systems, APIs, authentication, admin flows, and business logic." : "Laravel systems, APIs, authentication, admin flows နဲ့ business logic များကို တည်ဆောက်ပေးနိုင်ပါတယ်။",
-  },
-  {
-    icon: <FaDatabase className="text-2xl" />,
+    icon: <FaLaravel className="text-xl" />,
     title: language === "en" ? "Production Delivery" : "Production Delivery",
-    description: language === "en" ? "Database structure, AWS, Docker, hosting, and launch support." : "database structure, AWS, Docker, hosting နဲ့ launch support အထိ လုပ်ပေးနိုင်ပါတယ်။",
+    description: language === "en"
+      ? "2 independent production systems shipped plus 3+ other production workflows delivered."
+      : "ကိုယ်တိုင် production systems ၂ ခု shipped လုပ်ထားပြီး အခြား production workflows ၃ ခုအထက် delivered လုပ်ထားပါတယ်။",
+  },
+  {
+    icon: <FaDatabase className="text-xl" />,
+    title: language === "en" ? "Maintenance" : "Maintenance",
+    description: language === "en"
+      ? "4+ software products maintained, improved, and supported after launch."
+      : "launch ပြီးနောက် software ၄ ခုအထက်ကို maintenance, improvement နဲ့ support လုပ်ထားပါတယ်။",
   },
 ];
 
@@ -62,8 +68,8 @@ const getKnowledgeBase = (language: Language): Record<string, BotResponse> => {
   return {
     hello: {
       response: language === "en"
-        ? "Hello. I can summarize Kyaw's services, real production projects, tech stack, or contact details."
-        : "မင်္ဂလာပါ။ Kyaw ရဲ့ services, production projects, tech stack နဲ့ contact details တွေကို အကျဉ်းချုပ်ပြောပြနိုင်ပါတယ်။",
+        ? "Hello. I can summarize Kyaw's services, independent production projects, tech stack, maintenance work, or contact details."
+        : "မင်္ဂလာပါ။ Kyaw ရဲ့ services, independent production projects, tech stack, maintenance work နဲ့ contact details တွေကို အကျဉ်းချုပ်ပြောပြနိုင်ပါတယ်။",
     },
     skill: {
       response: language === "en"
@@ -72,6 +78,7 @@ const getKnowledgeBase = (language: Language): Record<string, BotResponse> => {
             "Frontend: React, Tailwind CSS, TypeScript, responsive UI",
             "Backend: PHP, Laravel, REST APIs, MySQL",
             "DevOps: AWS, Docker, Kubernetes, CI/CD",
+            "Delivery: 2 independent production systems, 3+ other production workflows, 4+ maintained products",
             "Tools: Git, GitHub, Vite, NPM",
           ]
         : [
@@ -79,13 +86,14 @@ const getKnowledgeBase = (language: Language): Record<string, BotResponse> => {
             "Frontend: React, Tailwind CSS, TypeScript, responsive UI",
             "Backend: PHP, Laravel, REST APIs, MySQL",
             "DevOps: AWS, Docker, Kubernetes, CI/CD",
+            "Delivery: production systems ၂ ခု, အခြား production workflows ၃ ခုအထက်, software ၄ ခုအထက် maintenance",
             "Tools: Git, GitHub, Vite, NPM",
           ],
     },
     project: {
       response: language === "en"
-        ? "Projects include current production systems first, then selected early experiments:"
-        : "လက်ရှိ production systems များကို အရင်ပြသပြီး selected early experiments များကိုနောက်တွင် ဖော်ပြထားပါတယ်။",
+        ? "Projects include selected production systems first, then practice projects that show the learning path:"
+        : "Selected production systems များကို အရင်ပြထားပြီး learning path ကိုပြသသော practice projects များကို နောက်တွင် ဖော်ပြထားပါတယ်။",
       isCard: true,
       cardData: projectCards,
     },
@@ -93,21 +101,21 @@ const getKnowledgeBase = (language: Language): Record<string, BotResponse> => {
       response: language === "en"
         ? [
             "What Kyaw can do:",
-            "Build complete business web systems",
-            "Modernize existing websites into clean responsive interfaces",
+            "Build business web systems from user flow to production release",
+            "Modernize existing websites into clear responsive interfaces",
             "Develop Laravel backends, APIs, dashboards, and admin workflows",
-            "Deploy projects with AWS, Docker, Kubernetes, and hosting",
+            "Deploy and support projects with AWS, Docker, domains, and hosting",
           ]
         : [
             "Kyaw လုပ်ပေးနိုင်တာ:",
-            "complete business web systems တည်ဆောက်ခြင်း",
-            "ရှိပြီးသား websites များကို clean responsive interfaces အဖြစ်ပြန်လည်တည်ဆောက်ခြင်း",
+            "user flow ကနေ production release အထိ business web systems တည်ဆောက်ခြင်း",
+            "ရှိပြီးသား websites များကို clear responsive interfaces အဖြစ်ပြန်လည်ပြင်ဆင်ခြင်း",
             "Laravel backends, APIs, dashboards, admin workflows တည်ဆောက်ခြင်း",
-            "AWS, Docker, Kubernetes, hosting တို့ဖြင့် deployment လုပ်ခြင်း",
+            "AWS, Docker, domains, hosting တို့ဖြင့် deploy လုပ်ပြီး support ပေးခြင်း",
           ],
     },
     experience: {
-      response: language === "en" ? "Practical experience areas:" : "အတွေ့အကြုံရှိသော အဓိကပိုင်းများ:",
+      response: language === "en" ? "Current experience summary:" : "လက်ရှိအတွေ့အကြုံ အကျဉ်းချုပ်:",
       isCard: true,
       cardData: experienceCards,
     },
@@ -118,8 +126,8 @@ const getKnowledgeBase = (language: Language): Record<string, BotResponse> => {
     },
     default: {
       response: language === "en"
-        ? "Ask me about projects, services, tech stack, experience, or how to contact Kyaw."
-        : "projects, services, tech stack, experience သို့မဟုတ် Kyaw ကို ဘယ်လိုဆက်သွယ်ရမလဲ ဆိုတာ မေးနိုင်ပါတယ်။",
+        ? "Ask me about projects, services, tech stack, experience, independent delivery, or how to contact Kyaw."
+        : "projects, services, tech stack, experience, independent delivery သို့မဟုတ် Kyaw ကို ဘယ်လိုဆက်သွယ်ရမလဲ ဆိုတာ မေးနိုင်ပါတယ်။",
     },
   };
 };
@@ -141,21 +149,22 @@ const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) =>
 
   const getBotResponse = (userInput: string) => {
     const input = userInput.toLowerCase();
-    if (input.includes("project") || input.includes("work")) return knowledgeBase.project;
+    if (input.includes("project") || input.includes("work") || input.includes("ပရောဂျက်") || input.includes("လုပ်ထား")) return knowledgeBase.project;
     if (input.includes("skill") || input.includes("technology") || input.includes("stack")) return knowledgeBase.skill;
-    if (input.includes("service") || input.includes("offer") || input.includes("do")) return knowledgeBase.service;
-    if (input.includes("contact") || input.includes("email") || input.includes("phone")) return knowledgeBase.contact;
-    if (input.includes("experience") || input.includes("background")) return knowledgeBase.experience;
-    if (input.includes("hello") || input.includes("hi")) return knowledgeBase.hello;
+    if (input.includes("service") || input.includes("offer") || input.includes("do") || input.includes("ဝန်ဆောင်မှု")) return knowledgeBase.service;
+    if (input.includes("contact") || input.includes("email") || input.includes("phone") || input.includes("ဆက်သွယ်")) return knowledgeBase.contact;
+    if (input.includes("experience") || input.includes("background") || input.includes("independent") || input.includes("maintenance") || input.includes("အတွေ့အကြုံ")) return knowledgeBase.experience;
+    if (input.includes("hello") || input.includes("hi") || input.includes("မင်္ဂလာ")) return knowledgeBase.hello;
     return knowledgeBase.default;
   };
 
   const handleSendMessage = () => {
-    if (inputValue.trim() === "") return;
+    const trimmedInput = inputValue.trim();
+    if (trimmedInput === "") return;
 
-    const userMessage = { text: inputValue, sender: "user" as const };
+    const userMessage = { text: trimmedInput, sender: "user" as const };
     setMessages((prev) => [...prev, userMessage]);
-    const currentInput = inputValue;
+    const currentInput = trimmedInput;
     setInputValue("");
     setIsTyping(true);
 
@@ -184,8 +193,9 @@ const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) =>
     }, 500);
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Enter") handleSendMessage();
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSendMessage();
   };
 
   useEffect(() => {
@@ -210,7 +220,7 @@ const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) =>
                 <FaRobot />
                 <h3 className="font-bold">{language === "en" ? "Portfolio Assistant" : "Portfolio Assistant"}</h3>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-light-bg/80 hover:text-light-bg" aria-label={language === "en" ? "Close chat" : "chat ပိတ်ရန်"}>
+              <button type="button" onClick={() => setIsOpen(false)} className="text-light-bg/80 hover:text-light-bg" aria-label={language === "en" ? "Close chat" : "chat ပိတ်ရန်"}>
                 <FaTimes />
               </button>
             </div>
@@ -281,12 +291,12 @@ const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) =>
             </div>
 
             <div className={`border-t p-3 ${isDark ? "border-slate-700 bg-slate-900" : "border-slate-200 bg-white"}`}>
-              <div className="flex">
+              <form className="flex" onSubmit={handleSubmit}>
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
+                  aria-label={language === "en" ? "Ask the portfolio assistant" : "portfolio assistant ကိုမေးရန်"}
                   placeholder={language === "en" ? "Ask about the portfolio..." : "portfolio အကြောင်းမေးပါ..."}
                   className={`min-w-0 flex-1 rounded-l-lg border px-3 py-2 text-sm outline-none focus:border-light-teal ${
                     isDark
@@ -295,17 +305,19 @@ const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) =>
                   }`}
                 />
                 <button
-                  onClick={handleSendMessage}
-                  className="flex items-center justify-center rounded-r-lg bg-light-font px-4 py-2 text-light-bg transition hover:bg-light-teal"
+                  type="submit"
+                  disabled={inputValue.trim() === ""}
+                  className="flex items-center justify-center rounded-r-lg bg-light-font px-4 py-2 text-light-bg transition hover:bg-light-teal disabled:cursor-not-allowed disabled:opacity-45"
                   aria-label={language === "en" ? "Send message" : "စာပို့ရန်"}
                 >
                   <FaPaperPlane />
                 </button>
-              </div>
+              </form>
             </div>
           </motion.div>
         ) : (
           <motion.button
+            type="button"
             key="chat-open-button"
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -316,7 +328,7 @@ const SmartChatBot = ({ isDark = false, language = "en" }: SmartChatBotProps) =>
             className="flex h-14 w-14 items-center justify-center rounded-full bg-light-font text-light-bg shadow-xl transition hover:bg-light-teal"
             aria-label={language === "en" ? "Open chat" : "chat ဖွင့်ရန်"}
           >
-            <FaRobot className="text-2xl" />
+            <FaRobot className="text-xl" />
           </motion.button>
         )}
       </AnimatePresence>
